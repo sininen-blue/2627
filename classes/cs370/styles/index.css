@@ -1,0 +1,21 @@
+:root {
+	--primary: #7A97EB;
+	--secondary: #D1AE4D;
+
+	--slidev-code-font-size: 14px !important;
+}
+
+.slidev-layout {
+	blockquote {
+		border-color: var(--primary);
+	}
+
+	strong {
+		font-weight: 600;
+		color: var(--secondary);
+	}
+
+	em {
+		color: var(--primary);
+	}
+}
