@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "slidev build",
-    "dev": "slidev --open",
-    "export": "slidev export"
+    "dev": "slidev --open $(find ./classes -name '*.md' | fzf)",
+    "export": "slidev export --dark $(find ./classes -name '*.md' | fzf) --with-clicks"
   },
   "dependencies": {
     "@slidev/cli": "^52.16.0",
