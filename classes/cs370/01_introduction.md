@@ -139,27 +139,30 @@ layout: two-cols-header
 ::left::
 One way of thinking about these different layers is through *virtual machines*
 
-Where each *hypothetical* machine runs a specific language
+Where each *hypothetical machine* runs a *specific language*
 
 Where `M0` would be a virtual machine that has a **physical** counterpart
 
-In the case where `M1` could be constructed cheaply enough, `M0` would disappear
 
+And a way to think abouc *translation* or *interpretation* is that we allow `m1` to run on `m0`
+
+```mermaid
+flowchart LR
+    M1["M1"] -->|"runs on"| M0["M0"]
+```
 ::right::
+
+So if `L0` is too difficult, we can make `L1`
+
+These languages (`L0` and `L1`) must not be *too* different
 ```mermaid
 flowchart TD
     L1["L1"] -->|"runs on"| M1["M1"]
     L0["L0"] -->|"runs on"| M0["M0"]
 ```
 
-These languages (`L0` and `L1`) must not be *too* different
-
-```mermaid
-flowchart LR
-    M1["M1"] -->|"runs on"| M0["M0"]
-```
-
 Usually this means that `L1` is only *slightly* more convenient than `L0`
+
 
 ---
 layout: two-cols-header
@@ -170,9 +173,9 @@ layout: two-cols-header
 ::left::
 A computer with `n` levels can be regarded as `n` different virtual machines
 
-Where programs in `Ln` are either *interpreted* by a program running on a *lower machine*
-
-Or are *translated* to the machine language of a *lower machine*
+Where programs in `Ln` are 
+- either *interpreted* by a program running on a *lower machine*, or
+- are *translated* to the machine language of a *lower machine*
 
 Note that *level* and *virtual machine* are interchangeable but virtual machine does have a other meanings
 

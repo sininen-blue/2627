@@ -26,7 +26,6 @@ To provide perspective on multilevel machines, we examine their historical devel
 
 In the very first computers, the boundary was **crystal clear**
 
-Over time it has **blurred** considerably due to the addition, removal, and *merging* of levels as computers *evolved*
 
 ```mermaid
 flowchart LR
@@ -34,12 +33,16 @@ flowchart LR
         direction LR
         HW1["Hardware"] ---|"crystal clear"| SW1["Software"]
     end
+```
+Over time it has **blurred** considerably due to the addition, removal, and *merging* of levels as computers *evolved*
+
+```mermaid
+flowchart LR
     subgraph Modern["Modern Computers"]
         direction LR
         HW2["Hardware"] ---|"blurred boundary"| SW2["Software"]
     end
 ```
-
 ---
 
 ## Hardware and Software are Logically Equivalent
@@ -51,7 +54,12 @@ And vice versa: any instruction executed by hardware can also be simulated in so
 As Karen Panetta put it
 > Hardware is just petrified software
 
-The decision to put functions in hardware *or* software is based on:
+---
+
+## Hardware and Software are Logically Equivalent
+
+And the decision to put functions in hardware *or* software is based on:
+
 - **cost** - which is cheaper to build or implement
 - **speed** - hardware is faster, software is more flexible
 - **reliability** - fewer components means fewer failure points
@@ -84,8 +92,8 @@ layout: two-cols-header
 
 ::left::
 The first digital computers had only *two levels*:
-- **ISA level (Level 1)** - where all programming was done
-- **Digital Logic level (Level 0)** - which directly executed ISA programs
+- **ISA level** - where all programming was done
+- **Digital Logic level** - which directly executed ISA programs
 
 Programs written in true machine language could be *directly executed* by electronic circuits **without** any intervening interpreters or translators
 
@@ -105,6 +113,8 @@ ISA programming is simply *no longer done today*, completely replaced by using a
 
 But the earliest programmable computer, like the *ENIAC* only had the *digital logic level* and the *instruction set architecture*
 
+And *critically* no memory
+
 In order to program it, the steps would include
 1. Writing, solving, and breaking down complex math into basic arithmetic steps
 2. Creating a schematic map on how data should physically flow through the units
@@ -118,7 +128,7 @@ layout: two-cols-header
 ## Invention of Microprogramming (Wilkes, 1951)
 
 ::left::
-In **1951**, Maurice Wilkes (University of Cambridge) suggested designing a *three-level computer* to 
+In **1951**, Maurice Wilkes suggested designing a *three-level computer* to 
 - drastically simplify hardware and 
 - reduce the number of unreliable vacuum tubes
 

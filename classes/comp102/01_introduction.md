@@ -155,7 +155,7 @@ Let's look at a smaller smaller grid to illustrate one of the possible strategie
 
 > A 2×3 grid is filled with five tiles, numbered 4 through 8, and one empty space. Initially, the grid is in a jumbled configuration. A tile can be slid into an adjacent empty space, leaving the tile’s previous location empty. The goal is to slide the tiles to place the grid in an ordered configuration, from tile 4 in the upper left.
 
-| 5 | 8 |   |
+| 6 | 8 |   |
 | --------------- | --------------- | --------------- |
 | 5 | 4 | 7 |
 
@@ -166,7 +166,7 @@ Let's look at a smaller smaller grid to illustrate one of the possible strategie
 A *train* is a sequence of tiles that are already in correct order, snaking through the grid
 
 **Strategy:**
-1. Pick the first unsolved tile (e.g., tile 4 in top-left)
+1. Pick the first unsolved tile 
 2. Move tiles to create a clear path
 3. Slide the target tile into position
 4. Repeat - each new tile "hitches" to the train
@@ -263,7 +263,7 @@ layout: center
 
 ## The Quarassi Lock
 
-<img src="./public/quarassi-lock.jpg" class="mx-auto rounded w-2/4 mt-16">
+<img src="./quarassi-lock.jpg" class="mx-auto rounded w-2/4 mt-16">
 
 ---
 layout: center
