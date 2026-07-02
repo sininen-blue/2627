@@ -64,7 +64,26 @@ flowchart LR
 ```
 
 ---
-layout: center
+
+## Flowchart shapes
+
+| Shape | Name | Symbol |
+|---|---|---|
+| Oval | Start / End | `( )` |
+| Rectangle | Action / Process | `[ ]` |
+| Diamond | Decision | `{ }` |
+| Parallelogram | Input / Output | `/ /` |
+| Cylinder | Data / Storage | `[( )]` |
+
+```mermaid
+flowchart TD
+    A(["Terminal (Start / End)"])
+    B["Process (Action)"]
+    C{"Decision"}
+    D[/"Input / Output"/]
+    E[("Database (Storage)")]
+```
+
 ---
 
 # Book recommendation flowchart
