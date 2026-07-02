@@ -11,13 +11,13 @@ What programs are made of
 layout: center
 ---
 
-## Make a peanut butter sandwich
+## How do you cook rice?
 
 ---
 layout: center
 ---
 
-## What is a computer
+# What is a computer
 
 A thing that does stuff
 
@@ -29,7 +29,7 @@ layout: center
 
 We will define computers as
 
-> A machine that takes in input and instructions and completes those instructions in order
+> A machine that takes in *instructions* and *completes* those instructions in order
 
 ---
 
@@ -37,7 +37,7 @@ We will define computers as
 
 The term you'll start being familiar with is
 
-**Algorithms**
+### *Algorithms*
 
 An algorithm is a *recipe*, a set of instructions to accomplish a task.
 
@@ -45,41 +45,19 @@ A *program* is simply a set of algorithms
 
 ---
 
-## Types of knowledge
-
-Declarartive
-
-Imperative
-
----
-
-## Psuedocode
-
----
-
-## Counting people
-
----
-
-## Counting Pairs
-
----
-
-## Condition
-
----
-
 ## How computers execute algorithms
 
-Computers perform simple
+Computers can **only** 
+- perform simple arithmetic and data movement, and
+- remember results and place them somewhere
 
-remember results
+Any and *all* complexity that you see in modern computers is a result of these simple operations
 
 ---
 layout: center
 ---
 
-# Will only do what you tell it to do
+# Computers will only do what you tell it to do
 
 ---
 layout: two-cols-header
@@ -119,16 +97,12 @@ layout: center
 ---
 
 # Robot
-8x8 grid, move forward, turn 90 right
+8x8 grid, 
+- move forward, 
+- turn 90 right
 
 ---
 layout: center
 ---
 
 # Maze
-
----
-
-# Maze with wolf
-
----
