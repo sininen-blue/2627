@@ -258,8 +258,128 @@ In *1958*, *Jack Kilby* and *Robert Noyce* (working independently) developed a s
 This made it possible to create computers that were *smaller*, *faster*, and *cheaper*
 
 ---
+layout: two-cols-header
+---
 
 ## System/360
 
+::left::
+In 1964, IBM was the leading computer company with two main machines the *7094 and the 1401*
+
+They were **incompatible**, and many customers had both and did not like that fact
+
+When IBM was looking to update their releases, they took a step which many computer manufacturers still do today
+
+> they introduced a *single* product line, the **System/360**
+
+It was the first *family* of machines with the same language, but with different sizes and power
+
+::right::
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/IBM_2030_in_New_Haven.jpg/960px-IBM_2030_in_New_Haven.jpg" class="mx-auto rounded w-1/4 mt-4">
+
+A company could *replace* their `360 model 30 with a model 75`
+
+And programs  written on one, could *theoretically* run on another
+
+The 360 also pioneered *multiprogramming*, what we would call *concurrency* today
+
+---
+layout: center
 ---
 
+# The Fourth Generation - Very Large Scale Integration
+The current era
+
+---
+
+## VLSI
+
+We no have chips with tens of thousands, hundreds of thousands, and millions of transistors in a single chip
+
+*smaller*, *faster*, *cheaper*
+
+Cheap enough that the concept of *personal computers* started appearing
+
+---
+
+## Intel 8080 kit
+
+<img src="https://newsroom.intel.com/wp-content/uploads/2024/12/newsroom-8080-hugin-150-cash-register.jpg" class="mx-auto rounded w-2/5 mt-4">
+
+The first personal computers were sold as **kits** with
+- the circuit board,
+- chips
+- power supply,
+- and a floppy disk
+
+Software was *not supplied* (including operating systems)
+
+---
+
+## Apple
+
+The *Apple II*, by Steve Jobs and Steve Wozniak became one of the most popular home user/school computer ever made at that point
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Apple_II-IMG_7064.jpg/1920px-Apple_II-IMG_7064.jpg" class="mx-auto rounded w-1/4 mt-4">
+
+It was also one of the first computers made that was **fully built**
+
+It was also aggressively marketed to schools and offered large discounts
+
+---
+
+## The start of the modern day desktop
+
+IBM created one of the most popular computers of that time, the *IBM Personal Computer* based on the *Intel 8088*
+
+
+
+They **also** made the design of the machines available for 49$, with the hopes of other companies making *plug in* boards
+
+This started the **industry** of computers
+
+Other companies made PCs using non intel chips, but they (mostly) *did not survive* (Commodore, Apple, Atari)
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Bundesarchiv_B_145_Bild-F077948-0006%2C_Jugend-Computerschule_mit_IBM-PC.jpg" class="mx-auto rounded w-1/4 mt-4">
+
+---
+
+## MS-DOS
+
+Early IBM PCs also came equipped with *MS-DOS*
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Ms-dosdir.png" class="mx-auto rounded w-1/4 mt-4">
+
+- `OS/2` was then created by Microsoft *and* IBM as a successor to MS-DOS
+- Microsoft also made *Windows* just in case OS/2 failed
+- OS/2 **failed**
+- Intel and Microsoft dethroned IBM as the **richest and most powerful corporations**
+
+
+---
+
+## 80386
+
+The first 32-bit CPU built by Intel because of their success, called the `80386`
+
+Which was then followed up by `80486`
+
+Subsequent versions were named *Pentium* and *Core*
+
+And the architecture they were built on top off is **x86**
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/04/KL_Intel_i386DX.jpg" class="mx-auto rounded w-1/4 mt-4">
+
+---
+
+RISC
+
+---
+
+64 bit
+
+---
+
+Dual core
+
+---
