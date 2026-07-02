@@ -22,7 +22,7 @@ layout: center
 
 Pascals machine could only do basic *addition* and *subtraction* operations
 
-[video](https://www.youtube.com/watch?v=CROrLQpN6dc)
+[video](https://www.youtube.com/watch?v=GX4RQK__fQc)
 
 ---
 
