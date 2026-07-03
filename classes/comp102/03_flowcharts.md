@@ -21,6 +21,10 @@ flowchart LR
     D --> E[End]
 ```
 
+Flowcharts take advantage of the fact that humans are *much better* at processing *visual* information, than textual
+
+Given the `robot` and maze from the previous lesson, make a flowchart to get it from point A to point B
+
 ---
 layout: center
 ---
@@ -44,7 +48,7 @@ flowchart LR
 
 Almost *every single program* is simply a combination of *steps* and *decisions*
 
-If you can find a problem, and break it down into a series of steps and decisions, then you can make a program for it
+If you can find a problem, and break it down into a series of *steps and decisions*, then you can make a program for it
 
 ---
 
@@ -62,6 +66,10 @@ flowchart LR
     C -->|Yes| D[You win]
     D --> ...
 ```
+
+Assume the `robot` has an extra function called `check if front is obstructed` and the robot will say *yes* if it is, and *no* if it isn't 
+
+Create a flowchart that solves the maze with **only one** `move forward` action
 
 ---
 
@@ -85,8 +93,11 @@ flowchart TD
 ```
 
 ---
+layout: center
+---
 
-# Book recommendation flowchart
+# An example of fairly complicated flowcharts
+book recommendations, customer service call tree, fighting games
 
 ---
 layout: center
@@ -95,10 +106,25 @@ layout: center
 # Morning routine flowchart
 build a flowchart for your morning routine
 
+You can use draw.io, excalidraw, paint, paper, etc 
+
 ---
 layout: center
 ---
 
 # Sorting algorithm flowchart
-build a flowchart that sorts 10 jumbled numbers (0, 1, 2, ..., 9)
+build a flowchart that sorts 5 jumbled numbers
 
+You're possible moves are
+- select the first number
+- move the selection left
+- check current number
+- check the number after the current
+- compare values
+- swap
+- record swap
+
+From 
+```
+51428 -> 14258
+```

@@ -53,6 +53,8 @@ Computers can **only**
 
 Any and *all* complexity that you see in modern computers is a result of these simple operations
 
+[minecraft](https://www.youtube.com/watch?v=egeMDudxZ_4)
+
 ---
 layout: center
 ---
@@ -70,13 +72,14 @@ Memory, Control Unit, Arithmetic Logic Unit, Input, Output
 
 Where the initial instructions are
 
-1. Add 3456, 3457
-2. Store 3458
-3. Add 3361, 34462
-4. Store 3456
-5. Compare, 3456, 3458
-6. Print
-
+```
+Add 3456, 3457
+Store 3458
+Add 3361, 34462
+Store 3456
+Compare, 3456, 3458
+Print
+```
 
 ::right::
 Where the initial memory state is
