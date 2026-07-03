@@ -372,14 +372,13 @@ And the architecture they were built on top off is **x86**
 
 ---
 
-RISC
+## Dual core
 
----
+By the end of the 1990s two important obstacles started appearing
+1. processors were *running out* of ways to go *faster*
+2. it became too expensive to *cool*
 
-64 bit
+So in 2001, *IBM* introduced the *POWER4* dual-core architecture, the first mainstream CPU to have more than one processor in the same chip
 
----
 
-Dual core
-
----
+<img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Power4_core_schema.png" class="mx-auto bg-white p-4 rounded w-1/4 mt-4">
