@@ -35,6 +35,12 @@
     `;
 
   const PANEL_PREFIX = "grade";
+  const DOCK_POSITIONS = {
+    tr: "top: 10px; right: 10px;",
+    tl: "top: 10px; left: 10px;",
+    br: "bottom: 10px; right: 10px;",
+    bl: "bottom: 10px; left: 10px;",
+  };
 
   function toggleCollapse() {
     const body = document.getElementById(`${PANEL_PREFIX}-body`);
@@ -46,18 +52,65 @@
     sessionStorage.setItem(`${PANEL_PREFIX}_collapsed`, collapsed ? "1" : "0");
   }
 
+  function setDockPosition(pos) {
+    const panel = document.getElementById("grade-panel");
+    if (!panel) return;
+    const inner = panel.querySelector("div");
+    if (!inner) return;
+
+    // Remove all position properties
+    inner.style.removeProperty("top");
+    inner.style.removeProperty("right");
+    inner.style.removeProperty("bottom");
+    inner.style.removeProperty("left");
+
+    // Apply new position
+    const css = DOCK_POSITIONS[pos] || DOCK_POSITIONS.tr;
+    for (const rule of css.split(";")) {
+      const [prop, val] = rule.split(":").map((s) => s.trim());
+      if (prop && val) inner.style[prop] = val;
+    }
+
+    // Highlight active dock button
+    document.querySelectorAll(`.${PANEL_PREFIX}-dock-btn`).forEach((btn) => {
+      btn.style.background = btn.dataset.pos === pos ? "#3a7bd5" : "none";
+      btn.style.color = btn.dataset.pos === pos ? "#fff" : "#aaa";
+    });
+
+    localStorage.setItem(`${PANEL_PREFIX}_dock_position`, pos);
+  }
+
+  function saveState() {
+    const rows = getRows();
+    const data = {
+      rows: rows.map((r) => ({ name: r.name, max: r.max })),
+      multiplier: parseFloat(document.getElementById("grade-multiplier")?.value) || 1,
+    };
+    localStorage.setItem(`${PANEL_PREFIX}_state`, JSON.stringify(data));
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(`${PANEL_PREFIX}_state`);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
   function createUI() {
     if (document.getElementById("grade-panel")) return;
 
     const collapsed = sessionStorage.getItem(`${PANEL_PREFIX}_collapsed`) === "1";
+    const savedPos = localStorage.getItem(`${PANEL_PREFIX}_dock_position`) || "tr";
+    const posCSS = DOCK_POSITIONS[savedPos] || DOCK_POSITIONS.tr;
 
     const panel = document.createElement("div");
     panel.id = "grade-panel";
     panel.innerHTML = `
             <div style="
                 position: fixed;
-                top: 10px;
-                right: 10px;
+                ${posCSS}
                 z-index: 99999;
                 background: #1a1a2e;
                 color: #fff;
@@ -74,21 +127,45 @@
                     <div style="font-weight: bold; font-size: 16px;">
                         Worksheet Grader
                     </div>
-                    <button id="${PANEL_PREFIX}-collapse-btn" style="
-                        width: 24px;
-                        height: 24px;
-                        background: none;
-                        border: 1px solid #555;
-                        border-radius: 4px;
-                        color: #aaa;
-                        cursor: pointer;
-                        font-size: 16px;
-                        font-weight: bold;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        line-height: 1;
-                    " title="Toggle panel">${collapsed ? "+" : "\u2212"}</button>
+                    <div style="display: flex; gap: 4px; align-items: center;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-right: 4px;">
+                            <button class="${PANEL_PREFIX}-dock-btn" data-pos="tl" style="
+                                width: 16px; height: 16px; background: none; border: 1px solid #555;
+                                border-radius: 2px; cursor: pointer; font-size: 8px; color: #aaa;
+                                display: flex; align-items: center; justify-content: center; padding: 0;
+                            " title="Dock top-left">◱</button>
+                            <button class="${PANEL_PREFIX}-dock-btn" data-pos="tr" style="
+                                width: 16px; height: 16px; background: none; border: 1px solid #555;
+                                border-radius: 2px; cursor: pointer; font-size: 8px; color: #aaa;
+                                display: flex; align-items: center; justify-content: center; padding: 0;
+                            " title="Dock top-right">◲</button>
+                            <button class="${PANEL_PREFIX}-dock-btn" data-pos="bl" style="
+                                width: 16px; height: 16px; background: none; border: 1px solid #555;
+                                border-radius: 2px; cursor: pointer; font-size: 8px; color: #aaa;
+                                display: flex; align-items: center; justify-content: center; padding: 0;
+                            " title="Dock bottom-left">◰</button>
+                            <button class="${PANEL_PREFIX}-dock-btn" data-pos="br" style="
+                                width: 16px; height: 16px; background: none; border: 1px solid #555;
+                                border-radius: 2px; cursor: pointer; font-size: 8px; color: #aaa;
+                                display: flex; align-items: center; justify-content: center; padding: 0;
+                            " title="Dock bottom-right">◳</button>
+                        </div>
+                        <button id="${PANEL_PREFIX}-collapse-btn" style="
+                            width: 24px;
+                            height: 24px;
+                            background: none;
+                            border: 1px solid #555;
+                            border-radius: 4px;
+                            color: #aaa;
+                            cursor: pointer;
+                            font-size: 16px;
+                            font-weight: bold;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            line-height: 1;
+                        " title="Toggle panel">${collapsed ? "+" : "\u2212"}</button>
+                    </div>
                 </div>
                 <div id="${PANEL_PREFIX}-body" style="display: ${collapsed ? "none" : ""};">
                     <div id="grade-status" style="margin-bottom: 10px; color: #aaa;">
@@ -192,7 +269,37 @@
     document.getElementById("btn-clear").addEventListener("click", handleClear);
     document.getElementById("grade-multiplier").addEventListener("input", calculateTotal);
 
-    generateRows(3);
+    // Dock buttons
+    document.querySelectorAll(`.${PANEL_PREFIX}-dock-btn`).forEach((btn) => {
+      btn.addEventListener("click", () => setDockPosition(btn.dataset.pos));
+    });
+
+    // Restore saved position highlight
+    document.querySelectorAll(`.${PANEL_PREFIX}-dock-btn`).forEach((btn) => {
+      btn.style.background = btn.dataset.pos === savedPos ? "#3a7bd5" : "none";
+      btn.style.color = btn.dataset.pos === savedPos ? "#fff" : "#aaa";
+    });
+
+    // Restore saved criteria state
+    const saved = loadState();
+    if (saved && saved.rows && saved.rows.length > 0) {
+      generateRows(saved.rows.length);
+      const container = document.getElementById("grade-rows");
+      if (container) {
+        for (let i = 0; i < saved.rows.length && i < container.children.length; i++) {
+          const row = container.children[i];
+          const nameInput = row.querySelector(".grade-criteria-name");
+          const maxInput = row.querySelector(".grade-max");
+          if (nameInput) nameInput.value = saved.rows[i].name || "";
+          if (maxInput) maxInput.value = saved.rows[i].max || "";
+        }
+      }
+      const multInput = document.getElementById("grade-multiplier");
+      if (multInput && saved.multiplier) multInput.value = saved.multiplier;
+      calculateTotal();
+    } else {
+      generateRows(3);
+    }
   }
 
   function log(message, type = "info") {
@@ -309,6 +416,7 @@
       el.style.color = finalMax > 0 ? "#00d2ff" : "#aaa";
     }
 
+    saveState();
     return { earned: finalEarned, max: finalMax };
   }
 
@@ -433,6 +541,7 @@
     const multiplier = document.getElementById("grade-multiplier");
     if (multiplier) multiplier.value = "1";
 
+    localStorage.removeItem(`${PANEL_PREFIX}_state`);
     calculateTotal();
     updateStatus("Cleared");
     log("All rows cleared");

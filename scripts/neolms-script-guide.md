@@ -129,6 +129,130 @@ const collapsed = sessionStorage.getItem(`${PANEL_PREFIX}_collapsed`) === "1";
 - When collapsed, only the title bar with toggle button is visible
 - Title bar margin-bottom changes: `10px` when expanded, `0` when collapsed
 
+### Dockable Panel
+
+Panels can be docked to any corner of the screen. A 2x2 grid of corner buttons in the title bar controls positioning.
+
+**Position CSS rules:**
+| Position | CSS |
+|----------|-----|
+| `tr` (top-right, default) | `top: 10px; right: 10px;` |
+| `tl` (top-left) | `top: 10px; left: 10px;` |
+| `br` (bottom-right) | `bottom: 10px; right: 10px;` |
+| `bl` (bottom-left) | `bottom: 10px; left: 10px;` |
+
+**Dock buttons HTML (2x2 grid in title bar):**
+```html
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-right: 4px;">
+    <button class="PREFIX-dock-btn" data-pos="tl" style="
+        width: 16px; height: 16px; background: none; border: 1px solid #555;
+        border-radius: 2px; cursor: pointer; font-size: 8px; color: #aaa;
+        display: flex; align-items: center; justify-content: center; padding: 0;
+    " title="Dock top-left">◱</button>
+    <button class="PREFIX-dock-btn" data-pos="tr" style="
+        width: 16px; height: 16px; background: none; border: 1px solid #555;
+        border-radius: 2px; cursor: pointer; font-size: 8px; color: #aaa;
+        display: flex; align-items: center; justify-content: center; padding: 0;
+    " title="Dock top-right">◲</button>
+    <button class="PREFIX-dock-btn" data-pos="bl" style="
+        width: 16px; height: 16px; background: none; border: 1px solid #555;
+        border-radius: 2px; cursor: pointer; font-size: 8px; color: #aaa;
+        display: flex; align-items: center; justify-content: center; padding: 0;
+    " title="Dock bottom-left">◰</button>
+    <button class="PREFIX-dock-btn" data-pos="br" style="
+        width: 16px; height: 16px; background: none; border: 1px solid #555;
+        border-radius: 2px; cursor: pointer; font-size: 8px; color: #aaa;
+        display: flex; align-items: center; justify-content: center; padding: 0;
+    " title="Dock bottom-right">◳</button>
+</div>
+```
+
+**`setDockPosition()` function:**
+```javascript
+const DOCK_POSITIONS = {
+    tr: "top: 10px; right: 10px;",
+    tl: "top: 10px; left: 10px;",
+    br: "bottom: 10px; right: 10px;",
+    bl: "bottom: 10px; left: 10px;",
+};
+
+function setDockPosition(pos) {
+    const panel = document.getElementById("PREFIX-panel");
+    if (!panel) return;
+    const inner = panel.querySelector("div");
+    if (!inner) return;
+
+    inner.style.removeProperty("top");
+    inner.style.removeProperty("right");
+    inner.style.removeProperty("bottom");
+    inner.style.removeProperty("left");
+
+    const css = DOCK_POSITIONS[pos] || DOCK_POSITIONS.tr;
+    for (const rule of css.split(";")) {
+        const [prop, val] = rule.split(":").map((s) => s.trim());
+        if (prop && val) inner.style[prop] = val;
+    }
+
+    // Highlight active button
+    document.querySelectorAll(".PREFIX-dock-btn").forEach((btn) => {
+        btn.style.background = btn.dataset.pos === pos ? "#3a7bd5" : "none";
+        btn.style.color = btn.dataset.pos === pos ? "#fff" : "#aaa";
+    });
+
+    localStorage.setItem("PREFIX_dock_position", pos);
+}
+```
+
+**Restore on init:**
+```javascript
+const savedPos = localStorage.getItem("PREFIX_dock_position") || "tr";
+// Apply DOCK_POSITIONS[savedPos] to panel inner div
+// Highlight active dock button
+```
+
+- Uses `localStorage` to remember position across sessions
+- Active button highlighted with `#3a7bd5` background
+- Corner glyphs: `◱` `◲` `◰` `◳`
+
+### Persist State
+
+Save form state to `localStorage` so it persists between page loads (e.g., when switching students).
+
+**What to save:** Form field values (names, max points, config). Do NOT save transient data (earned points, status messages).
+
+**`saveState()` function:**
+```javascript
+function saveState() {
+    const data = {
+        rows: getRows().map((r) => ({ name: r.name, max: r.max })),
+        multiplier: parseFloat(document.getElementById("PREFIX-multiplier")?.value) || 1,
+    };
+    localStorage.setItem("PREFIX_state", JSON.stringify(data));
+}
+```
+
+**`loadState()` function:**
+```javascript
+function loadState() {
+    try {
+        const raw = localStorage.getItem("PREFIX_state");
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+}
+```
+
+**When to save:** Call `saveState()` inside any function that modifies saved fields (e.g., `calculateTotal()`, which runs on every input change).
+
+**When to load:** In `createUI()` after generating default rows — if `loadState()` returns data, restore field values and row count.
+
+**When to clear:** In `handleClear()`, call `localStorage.removeItem("PREFIX_state")`.
+
+- `localStorage` key: `PREFIX_state`
+- Stores `{ rows: [{name, max}], multiplier: number }`
+- Earned points are intentionally NOT saved — they reset per student
+
 ### Status Line
 
 ```html
@@ -424,6 +548,7 @@ if (document.readyState === "loading") {
 | Panel div     | `PREFIX-panel`       | `enroll-panel`       |
 | Body wrapper  | `PREFIX-body`        | `enroll-body`        |
 | Collapse btn  | `PREFIX-collapse-btn`| `enroll-collapse-btn`|
+| Dock btns     | `PREFIX-dock-btn`    | `enroll-dock-btn`    |
 | Status div    | `PREFIX-status`      | `enroll-status`      |
 | Progress      | `PREFIX-progress`    | `enroll-progress`    |
 | Textarea      | `PREFIX-input`       | `enroll-input`       |
@@ -441,11 +566,13 @@ if (document.readyState === "loading") {
 ## Rules Summary
 
 1. Always use IIFE wrapper with `"use strict"`
-2. Panel: fixed top-right, dark theme, z-index 99999
+2. Panel: fixed position, dark theme, z-index 99999
 3. All panels must be collapsible (toggle button in title bar, body wrapper)
-4. Prefix all IDs with script name to avoid collisions
-5. Include `log()`, `updateStatus()`, `updateProgress()`, `sleep()` helpers
-6. Use MutationObserver to detect modal appearance
-7. Check for duplicate panel before creating
-8. Start/Stop buttons only — never auto-submit site forms
-9. Log all actions with timestamps and color-coded types
+4. All panels must be dockable to any corner (4 dock buttons, localStorage)
+5. Prefix all IDs with script name to avoid collisions
+6. Include `log()`, `updateStatus()`, `updateProgress()`, `sleep()` helpers
+7. Persist form state to localStorage (names/config only, not transient data)
+8. Use MutationObserver to detect modal appearance
+9. Check for duplicate panel before creating
+10. Start/Stop buttons only — never auto-submit site forms
+11. Log all actions with timestamps and color-coded types
