@@ -11,36 +11,7 @@
 (function () {
   "use strict";
 
-  const STUDENT_IDS = [
-    "26100000411",
-    "24100001500",
-    "26100000331",
-    "26100000290",
-    "26100001390",
-    "26100000717",
-    "26100001373",
-    "26100000224",
-    "26100001280",
-    "26100000291",
-    "26100000229",
-    "26100000330",
-    "26100000984",
-    "26100001370",
-    "25200001748",
-    "26100001226",
-    "26100001396",
-    "26100000502",
-    "26100001242",
-    "26100000487",
-    "20100000339",
-    "26100000959",
-    "26100000809",
-    "26100000418",
-    "26100000220",
-    "26100000936",
-    "26100000889",
-  ];
-
+  let STUDENT_IDS = [];
   let currentIndex = 0;
   let isRunning = false;
 
@@ -68,7 +39,7 @@
                     Auto Enroll Students
                 </div>
                 <div id="enroll-status" style="margin-bottom: 10px; color: #aaa;">
-                    Ready. Total: ${STUDENT_IDS.length} students
+                    Ready
                 </div>
                 <div style="margin-bottom: 10px;">
                     <div style="background: #333; border-radius: 4px; overflow: hidden;">
@@ -80,6 +51,20 @@
                         "></div>
                     </div>
                 </div>
+                <textarea id="enroll-ids" style="
+                    width: 100%;
+                    height: 80px;
+                    margin-bottom: 10px;
+                    padding: 8px;
+                    border: 1px solid #333;
+                    border-radius: 4px;
+                    background: #111;
+                    color: #fff;
+                    font-family: monospace;
+                    font-size: 12px;
+                    resize: vertical;
+                    box-sizing: border-box;
+                " placeholder="Paste IDs here (space or newline separated)"></textarea>
                 <div style="display: flex; gap: 8px;">
                     <button id="btn-start" style="
                         flex: 1;
@@ -279,8 +264,30 @@
 
   function startEnrollment() {
     if (isRunning) return;
+
+    const textarea = document.getElementById("enroll-ids");
+    if (!textarea) {
+      log("Input textarea not found", "error");
+      return;
+    }
+
+    const raw = textarea.value.trim();
+    if (!raw) {
+      log("No IDs provided. Paste IDs into the textarea.", "error");
+      return;
+    }
+
+    STUDENT_IDS = raw.split(/[\s,]+/).filter((id) => id.length > 0);
+    currentIndex = 0;
+
+    if (STUDENT_IDS.length === 0) {
+      log("No valid IDs found", "error");
+      return;
+    }
+
     isRunning = true;
-    log("Starting enrollment process...");
+    updateStatus(`Processing 0/${STUDENT_IDS.length}`);
+    log(`Starting enrollment: ${STUDENT_IDS.length} students`);
     processNextStudent();
   }
 
