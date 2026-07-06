@@ -68,6 +68,67 @@ Consistent rules for building UI panels across NeoLMS userscripts.
 </div>
 ```
 
+### Collapsible Panel
+
+All panels should be collapsible. The title bar includes a toggle button (`−` / `+`) on the right side. Everything below the title is wrapped in a `PREFIX-body` div.
+
+**Title bar with toggle:**
+```html
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <div style="font-weight: bold; font-size: 16px;">
+        Script Title
+    </div>
+    <button id="PREFIX-collapse-btn" style="
+        width: 24px;
+        height: 24px;
+        background: none;
+        border: 1px solid #555;
+        border-radius: 4px;
+        color: #aaa;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    " title="Toggle panel">−</button>
+</div>
+```
+
+**Body wrapper (everything below title):**
+```html
+<div id="PREFIX-body">
+    <!-- status, inputs, buttons, log go here -->
+</div>
+```
+
+**Toggle function:**
+```javascript
+const PANEL_PREFIX = "PREFIX";
+
+function toggleCollapse() {
+    const body = document.getElementById(`${PANEL_PREFIX}-body`);
+    const btn = document.getElementById(`${PANEL_PREFIX}-collapse-btn`);
+    if (!body || !btn) return;
+    const collapsed = body.style.display === "none";
+    body.style.display = collapsed ? "" : "none";
+    btn.textContent = collapsed ? "\u2212" : "+";
+    sessionStorage.setItem(`${PANEL_PREFIX}_collapsed`, collapsed ? "1" : "0");
+}
+```
+
+**Restore state on init:**
+```javascript
+const collapsed = sessionStorage.getItem(`${PANEL_PREFIX}_collapsed`) === "1";
+// Set body display and btn text accordingly in createUI
+```
+
+- Uses `sessionStorage` to remember collapse state during the session
+- `−` (unicode `\u2212`) for expanded, `+` for collapsed
+- When collapsed, only the title bar with toggle button is visible
+- Title bar margin-bottom changes: `10px` when expanded, `0` when collapsed
+
 ### Status Line
 
 ```html
@@ -276,11 +337,25 @@ if (document.readyState === "loading") {
 (function () {
     "use strict";
 
+    const PANEL_PREFIX = "PREFIX";
+
     let currentIndex = 0;
     let isRunning = false;
 
+    function toggleCollapse() {
+        const body = document.getElementById(`${PANEL_PREFIX}-body`);
+        const btn = document.getElementById(`${PANEL_PREFIX}-collapse-btn`);
+        if (!body || !btn) return;
+        const collapsed = body.style.display === "none";
+        body.style.display = collapsed ? "" : "none";
+        btn.textContent = collapsed ? "\u2212" : "+";
+        sessionStorage.setItem(`${PANEL_PREFIX}_collapsed`, collapsed ? "1" : "0");
+    }
+
     function createUI() {
         if (document.getElementById("PREFIX-panel")) return;
+
+        const collapsed = sessionStorage.getItem(`${PANEL_PREFIX}_collapsed`) === "1";
 
         const panel = document.createElement("div");
         panel.id = "PREFIX-panel";
@@ -298,18 +373,40 @@ if (document.readyState === "loading") {
                 font-family: Arial, sans-serif;
                 font-size: 14px;
                 min-width: 280px;
+                max-height: 90vh;
+                overflow-y: auto;
             ">
-                <div style="margin-bottom: 10px; font-weight: bold; font-size: 16px;">
-                    Script Title
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${collapsed ? "0" : "10px"};">
+                    <div style="font-weight: bold; font-size: 16px;">
+                        Script Title
+                    </div>
+                    <button id="${PANEL_PREFIX}-collapse-btn" style="
+                        width: 24px;
+                        height: 24px;
+                        background: none;
+                        border: 1px solid #555;
+                        border-radius: 4px;
+                        color: #aaa;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: bold;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        line-height: 1;
+                    " title="Toggle panel">${collapsed ? "+" : "\u2212"}</button>
                 </div>
-                <div id="PREFIX-status" style="margin-bottom: 10px; color: #aaa;">
-                    Ready
+                <div id="${PANEL_PREFIX}-body" style="display: ${collapsed ? "none" : ""};">
+                    <div id="PREFIX-status" style="margin-bottom: 10px; color: #aaa;">
+                        Ready
+                    </div>
+                    <!-- progress bar, inputs, buttons, log here -->
                 </div>
-                <!-- progress bar, inputs, buttons, log here -->
             </div>
         `;
         document.body.appendChild(panel);
 
+        document.getElementById(`${PANEL_PREFIX}-collapse-btn`).addEventListener("click", toggleCollapse);
         document.getElementById("btn-start").addEventListener("click", start);
         document.getElementById("btn-stop").addEventListener("click", stop);
     }
@@ -322,16 +419,18 @@ if (document.readyState === "loading") {
 
 ## Naming Conventions
 
-| Element     | Pattern              | Example              |
-|-------------|----------------------|----------------------|
-| Panel div   | `PREFIX-panel`       | `enroll-panel`       |
-| Status div  | `PREFIX-status`      | `enroll-status`      |
-| Progress    | `PREFIX-progress`    | `enroll-progress`    |
-| Textarea    | `PREFIX-input`       | `enroll-input`       |
-| Log panel   | `PREFIX-log`         | `enroll-log`         |
-| Start btn   | `btn-start`          | `btn-start`          |
-| Stop btn    | `btn-stop`           | `btn-stop`           |
-| Action btn  | `btn-ACTION`         | `btn-export`         |
+| Element       | Pattern              | Example              |
+|---------------|----------------------|----------------------|
+| Panel div     | `PREFIX-panel`       | `enroll-panel`       |
+| Body wrapper  | `PREFIX-body`        | `enroll-body`        |
+| Collapse btn  | `PREFIX-collapse-btn`| `enroll-collapse-btn`|
+| Status div    | `PREFIX-status`      | `enroll-status`      |
+| Progress      | `PREFIX-progress`    | `enroll-progress`    |
+| Textarea      | `PREFIX-input`       | `enroll-input`       |
+| Log panel     | `PREFIX-log`         | `enroll-log`         |
+| Start btn     | `btn-start`          | `btn-start`          |
+| Stop btn      | `btn-stop`           | `btn-stop`           |
+| Action btn    | `btn-ACTION`         | `btn-export`         |
 
 - `PREFIX` = short script name (`enroll`, `export`, `bulk`, `roster`, etc.)
 - Buttons always `btn-` prefix
@@ -343,9 +442,10 @@ if (document.readyState === "loading") {
 
 1. Always use IIFE wrapper with `"use strict"`
 2. Panel: fixed top-right, dark theme, z-index 99999
-3. Prefix all IDs with script name to avoid collisions
-4. Include `log()`, `updateStatus()`, `updateProgress()`, `sleep()` helpers
-5. Use MutationObserver to detect modal appearance
-6. Check for duplicate panel before creating
-7. Start/Stop buttons only — never auto-submit site forms
-8. Log all actions with timestamps and color-coded types
+3. All panels must be collapsible (toggle button in title bar, body wrapper)
+4. Prefix all IDs with script name to avoid collisions
+5. Include `log()`, `updateStatus()`, `updateProgress()`, `sleep()` helpers
+6. Use MutationObserver to detect modal appearance
+7. Check for duplicate panel before creating
+8. Start/Stop buttons only — never auto-submit site forms
+9. Log all actions with timestamps and color-coded types
