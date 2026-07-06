@@ -1,6 +1,6 @@
 ---
 title: 04 Processors
-exportFilename: exports/cs370/03_processors
+exportFilename: exports/cs370/04_processors
 lineNumbers: true
 ---
 
