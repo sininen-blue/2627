@@ -23,13 +23,12 @@ flowchart LR
 
 Flowcharts take advantage of the fact that humans are *much better* at processing *visual* information, than textual
 
-Given the `robot` and maze from the previous lesson, make a flowchart to get it from point A to point B
-
 ---
 layout: center
 ---
 
 # Remember the Robot Maze
+Given the `robot` and maze from the previous lesson, make a flowchart to get it from point A to point B
 
 ---
 
@@ -51,6 +50,12 @@ Almost *every single program* is simply a combination of *steps* and *decisions*
 If you can find a problem, and break it down into a series of *steps and decisions*, then you can make a program for it
 
 ---
+layout: center
+---
+
+# Recommendation flowcharts
+
+---
 
 ## Loops
 
@@ -67,13 +72,27 @@ flowchart LR
     D --> ...
 ```
 
-Assume the `robot` has an extra function called `check if front is obstructed` and the robot will say *yes* if it is, and *no* if it isn't 
+---
+layout: center
+---
 
-Create a flowchart that solves the maze with **only one** `move forward` action
+# Back to the maze (again)
+
+Assume the `robot` has an extra function called 
+
+- `check if front is obstructed` and the robot will say *yes* if it is, and *no* if it isn't 
+
+Create a flowchart that solves the maze with **only one** `move forward` action block being used
+
+So the possible actions are
+- check if front is obstructed
+- turn right 90 degrees
+- turn left 90 degrees
+- move forward (limited to 1)
 
 ---
 
-## Flowchart shapes
+## Other shapes
 
 | Shape | Name | Symbol |
 |---|---|---|
@@ -91,13 +110,6 @@ flowchart TD
     D[/"Input / Output"/]
     E[("Database (Storage)")]
 ```
-
----
-layout: center
----
-
-# An example of fairly complicated flowcharts
-book recommendations, customer service call tree, fighting games
 
 ---
 layout: center

@@ -339,16 +339,6 @@ At its core assembly is simple a **symbolic** representation of one of the lower
 
 And it's then converted into a numeric with an **assembler**
 
-::right::
-```mermaid
-flowchart TD
-    L4["Level 4 - Assembly Language"]
-    L3["Level 3 - Operating System"]
-    L2["Level 2 - ISA"]
-    L1["Level 1 - Microarchitecture"]
-    L0["Level 0 - Digital Logic"]
-    L4 --> L3 --> L2 --> L1 --> L0
-```
 ---
 layout: two-cols-header
 ---
@@ -366,16 +356,6 @@ Provides abstractions like
 - far removed from hardware details
 
 ::right::
-```mermaid
-flowchart TD
-    L5["Level 5 - Problem-Oriented Language"]
-    L4["Level 4 - Assembly Language"]
-    L3["Level 3 - Operating System"]
-    L2["Level 2 - ISA"]
-    L1["Level 1 - Microarchitecture"]
-    L0["Level 0 - Digital Logic"]
-    L5 --> L4 --> L3 --> L2 --> L1 --> L0
-```
 
 ---
 
