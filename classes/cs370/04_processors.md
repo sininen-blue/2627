@@ -13,196 +13,175 @@ layout: two-cols-header
 ## Overview
 
 ::left::
-A computer consists of many parts
+A computer consists of many moving parts, but the primary engine is the **Processor (CPU)**.
 
-Of these parts, the primary one is the **Processor**
-
-This *executes* programs stored in main memory by
-1. fetching the instructions
-2. examining them
-3. executing them one after another
+The CPU *executes* programs stored in main memory by continuously cycling through three steps:
+1. **Fetching** instructions
+2. **Decoding** (examining) them
+3. **Executing** them sequentially one after another
 
 ::right::
 <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/2023_Intel_Core_i7_12700KF_%284%29.jpg" class="mx-auto rounded w-2/4">
 
 ---
 
-## Parts
+## Core Components of a CPU
 
-A processor has several parts
+A processor relies on four fundamental pillars to operate:
 
-1. **Control Unit**, which *fetches and decodes* instructions
-2. **Arithmetic Logic Unit**, which *does the instructions*
-3. **Registers**, which *hold data*
+* **Control Unit (CU):** The manager; it *fetches and decodes* instructions.
+* **Arithmetic Logic Unit (ALU):** The muscle; it *calculates and executes* math and logic operations.
+* **Registers:** Ultra-fast, internal storage units that *hold active data* and states.
+* **Bus:** A highway system of wires used for *moving data* both inside the CPU and to external components (like RAM).
 
 <img src="./processor.png" class="mx-auto rounded w-2/5">
 
-And a *bus*, which is a collection of wires for *moving data* both inside the processor, and outside the processor
-
 ---
 
-## Registers
+## The Essential Registers
 
-There are two important registers usually found in every von nuemann architecture computer
+While modern CPUs feature dozens of specialized registers, two remain absolutely vital to the Von Neumann architecture:
 
-1. Program Counter (PC)
+1. **Program Counter (PC)**
+   Points to the memory address of the *next instruction* to be fetched.
 
-which points to the *next instruction* 
-
-2. Instruction Register (IR)
-
-which holds the *current instruction*
+2. **Instruction Register (IR)**
+   Holds the *current instruction* while it is being decoded and executed.
 
 ---
 layout: two-cols-header
 ---
 
-## Data path
+## The Data Path
 
 ::left::
-At the heart of most computer systems is a **Data Path Cycle**, as defined by the Von Neumann architecture
+The **Data Path** is the heart of CPU operation, directly dictating the overall speed of the processor.
 
-- The registers *input* into ALU input registers, 
-- which then *input into the ALU*, 
-- and the ALU output registers feed back into the registers
+* **Registers** feed data into the ALU input registers.
+* The **ALU** performs a simple operation (addition, subtraction, or logical shifts).
+* The results are stored in **ALU output registers**, which feed back into the main registers.
+* From there, data can be saved back into system memory.
 
-The ALU performing some simple addition, subtraction, or logical operations
-
-The register can then be saved into memory
-
-This is called the **Data Path Cycle** which is often determines the speed of your cpu
+The time required for this internal cycle to complete defines the CPU's maximum clock speed.
 
 ::right::
+
 <img src="./data_path.png" class="mx-auto rounded w-4/5">
 
 ---
 
-## Instruction Execution Cycle
+## The Instruction Execution Cycle
 
-Roughly, the instruction execution cycle can be broken down into the following steps:
+The continuous loop running under the hood of almost every computer is the **Fetch-Decode-Execute Cycle**:
 
-1. *Fetch* the instructions from memory into the instruction register
-2. Change the program counter to point to the next instruction
-3. *Determine* the type of instruction fetched
-    1. If the instruction uses a word in memory, determine where it is
-    2. Fetch the word, if needed, into a CPU register
-4. *Execute* the instruction
-5. Go to step 1 to begin executing the *next* instruction
 
-This is frequently referred to as the **fetch-decode-execute cycle** and is how most computers work
+1. **Fetch:** *Copy* the instruction from the memory address in the PC into the IR.
+2. **Increment:** *Update* the PC to point to the next sequential instruction.
+3. **Decode:** Determine the *type of instruction* and locate any required data in memory.
+4. **Fetch Data:** *Pull* necessary data words into CPU registers (if required).
+5. **Execute:** *Run* the instruction via the ALU/Control Unit.
+6. **Repeat:** Loop back to Step 1.
 
 ---
 layout: center
 ---
 
-## Equivalency of software and hardware
+## Hardware vs. Software Equivalency
 
-Notice how it would be fairly simple to create a version of this cycle *purely in code*
+Because the Fetch-Decode-Execute cycle is *purely logical*, it doesn't *have* to be executed by physical transistors. 
 
-The fact that it's possible to *imitate* the function of a CPU shows that a program *need not* be executed by a "*physical*" CPU
+> Any operation performed by software can be built directly into hardware, and any operation executed by hardware can be simulated by software.
 
-It can simply be carried out by having a **program** do the *fetch, examine, and execute* cycle
+If we write a software program to mimic this cycle, we call it an **Interpreter** or an **Emulator**. 
 
-This program would be called an interpreter
-
----
-
-## Equivalency of software and hardware
-
-When a design team *creates a new machine language* $L$, 
-
-They can then decide if they want to *write an interpreter* for it, or to *create a new hardware implementation* for it
+This introduces a massive architectural choice for chip designers: 
+- do we build complex logic into physical wiring, or 
+- do we handle it via lower-level software?
 
 ---
 
-## Benefits of a complex hardware implementation
+## The Shift to Microprogramming
 
-Complex hardware instruction are simply **faster**
+In `1951`, Maurice Wilkes introduced **Microprogramming** to bypass intense physical hardware limitations. 
 
-- floating-point arithmetic
-- array accessing
-- complex math
-- instructions usually called consecutively
+Instead of building massive, expensive circuits for complex instructions, designers created a "CPU within a CPU." 
+* *Macro-instructions* (complex user code) are intercepted.
+* A tiny, built-in hardware interpreter breaks them down into simpler *micro-instructions* executed by the underlying hardware.
 
-More complex instructions could also be *overlapped* and run in *parallel* easier
-
-But high complexity hardware was *expensive*, but the speed was (usually) worth it
+This shift led to the creation of the legendary **IBM System/360** (1964).
 
 ---
 
-## The shift to interpreters
+## Benefits of Microprogramming
 
-- instruction *compatibility* requirements, and
-- the need for software developers to have those complex instructions on *lower end* machines
+By moving complex instruction handling to an *internal microcode layer*, manufacturers realized several major advantages:
 
-IBM realized that supporting a *single family* of machines which executed the same instructions had many advantages
+1. **Architecture Compatibility:** IBM introduced the term *architecture* because microprogramming allowed an entire family of machines (from cheap low-end models to expensive mainframes) to run the exact same software.
+2. **Flexibility:** Allowed manufacturers to "hotfix" hardware bugs in the field via microcode updates.
+3. **Cost-Effective Design:** New, complex instructions could be added at a minimal cost without redesigning the physical silicon.
 
-IBM introduced the term **architecture** for this kind of compatibility
-
----
-
-## The shift to interpreters
-
-*Maurice Wilkes (1951)* first suggested interpretation as a way to get past hardware limits
-
-Which led to the creation of the *IBM System/360*
-
-This shift to interpretation also included  some *other* benefits:
-1. the ability to *hotfix* issues on field 
-2. the ability to *add new* instructions at a minimal cost, and 
-3. easier development, testing, and documentation of complex instructions
-
-By the late 70s, only the most expensive highest-performance models didn't use interpreters to handle their complex instructions
-
-Microprocessors also moved to interpreter-based design
+By the late 1970s, almost all microprocessors used microcode to handle complex instructions.
 
 ---
 
-## RISC and CISC
+## RISC vs. CISC
 
-During the late 70s, designers continued to experiment with complex instructions made possible by interpreters
+By the late `1970s`, processors had become **Complex Instruction Set Computers (CISC)**. They featured massive, highly complex instruction sets designed to bridge the "*semantic gap*" between machine code and high-level programming languages.
 
-Programmers and designers tend towards complexity and **powerful solutions**,
-- this tendency was geared towards closing the *semantic gap* between the machine code and high-level languages
+However, in `1980`, a group led by *David Patterson* and *Carlo Sequin* challenged this trend, introducing **Reduced Instruction Set Computers (RISC)** via the RISC I and RISC II architectures.
 
-But in 1980, a group led by *David Patterson* and *Carlo Sequin* began designing VLSI chips that **didn't** use interpretation. 
-
-They called this a *Reduced Instruction Set Computer* (RISC), and produced the RISC I followed by the RISC II
-
----
-
-## RISC
-
-These processors were designed to be *completely new* and **non-backwards compatible**, 
-
-This allowed the designers to create instruction sets that would *maximize performance*.
-
-With the emphasis of *simple instructions that could be executed quickly*
-
-- if it takes a RISC machine *4–5 instructions* to do what a CISC machine can do in *1*, 
-- the RISC machine is still 10–20 times faster
+| Feature | CISC (Complex) | RISC (Reduced) |
+| :--- | :--- | :--- |
+| **Instruction Philosophy** | Complex tasks in fewer, varied instructions. | Simple tasks executed fast using uniform instructions. |
+| **Execution** | Uses microcode interpretation; variable clock cycles. | Directly executed by hardware; highly pipelined. |
+| **Memory Access** | Many instructions can interact with memory. | Only explicit `LOAD` and `STORE` instructions touch memory. |
 
 ---
 
-## RISC isn't mainstream
+## RISC vs. CISC in Practice
 
-The **lack** of backward compatibility and existing **billions** companies have invested in existing software for *x86* means adoption of RISC wa slow 
+look at how both architectures handle multiplying numbers stored in memory:
 
-Another factor is that modern *CISC* **does** use RISC ideas, usually having a *RISC core* with common instructions
+- CISC Approach (Single, complex instruction)
+```
+MULTIPLY [Memory Location A], [Memory Location B]
+```
 
-Recently, with advancements of *APPLE* and *RISC* laptops, ARM (which is risc) is slowly gaining popularity
+- RISC Approach (Multiple, simple instructions)
+```
+LOAD  Register 1, [Memory Location A]
+LOAD  Register 2, [Memory Location B]
+PROD  Register 1, Register 2
+STORE Register 1, [Memory Location A]
+```
+
+Even though RISC requires *more lines of code*, its uniform, simple instructions execute so **quickly** (often 1 cycle per instruction) that it **outpaced** pure CISC performance.
 
 ---
 
-## Design principles of modern computers
+## The Modern Landscape
 
-Certain design decisions have slowly crystallized over the decades, 
+While desktop computing was *historically dominated* by x86 (CISC) due to backward compatibility and legacy software investments, the modern landscape is heavily defined by a **synthesis** of both:
 
-Where every new advancement in computing technology usually *emphasize* the following:
+1. **Hybrid Cores:** Modern x86 processors (Intel/AMD) are actually hybrids. 
+    - They feature a CISC outer shell that decodes legacy instructions into internal, RISC-like "micro-ops."
 
-1. All instructions are directly executed by hardware
-2. Maximize instruction issue rate
-3. Instructions should be easy to decode
-4. Only loads and stores should reference memory
-5. Have a lot of registers
+2. **RISC Dominance:** RISC *is* mainstream just not in consumer computers. 
+    - *ARM* (a RISC architecture) powers virtually the entire mobile ecosystem, 
+    - modern supercomputers, 
+    - major cloud data centers, and 
+    - Apple Silicon laptops/desktops.
+3. **Open-Source Hardware:** 
+    - **RISC-V** is rapidly expanding across the industry as an open-standard RISC ISA.
 
+---
+
+## Principles of RISC
+
+RISC *is the future*, and so the design decisions of RISC also because the new way to architect general-puropes CPUs
+
+1. **Direct Hardware Execution:** Maximize instructions executed directly by hardware to avoid microcode overhead.
+2. **Maximize Issue Rate:** Optimize pipelining to start executing new instructions before previous ones finish.
+3. **Easy Decoding:** Keep instructions at a fixed length with uniform formats to make parsing instant.
+4. **Isolated Memory Access:** Only explicit `LOAD` and `STORE` instructions should touch RAM; all calculations must happen inside registers.
+5. **Abundant Registers:** Provide plenty of registers to minimize the need to wait on slow system memory.
