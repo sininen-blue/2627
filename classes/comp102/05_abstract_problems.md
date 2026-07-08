@@ -107,3 +107,9 @@ Write the following logical expressions in words
 7. $\neg p \implies q$
 8. $p \iff q$
 9. $\neg p \iff q$
+
+---
+
+## Tables and compound values
+
+---
