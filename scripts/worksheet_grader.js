@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NeoLMS Worksheet Grader
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.2
 // @description  Bulk grade worksheet assignments with rubric rows
 // @match        https://urios.neolms.com/teacher_dropbox_assignment/grade/*
 // @grant        none
@@ -84,7 +84,8 @@
     const rows = getRows();
     const data = {
       rows: rows.map((r) => ({ name: r.name, max: r.max })),
-      multiplier: parseFloat(document.getElementById("grade-multiplier")?.value) || 1,
+      multiplier:
+        parseFloat(document.getElementById("grade-multiplier")?.value) || 1,
     };
     localStorage.setItem(`${PANEL_PREFIX}_state`, JSON.stringify(data));
   }
@@ -101,8 +102,10 @@
   function createUI() {
     if (document.getElementById("grade-panel")) return;
 
-    const collapsed = sessionStorage.getItem(`${PANEL_PREFIX}_collapsed`) === "1";
-    const savedPos = localStorage.getItem(`${PANEL_PREFIX}_dock_position`) || "tr";
+    const collapsed =
+      sessionStorage.getItem(`${PANEL_PREFIX}_collapsed`) === "1";
+    const savedPos =
+      localStorage.getItem(`${PANEL_PREFIX}_dock_position`) || "tr";
     const posCSS = DOCK_POSITIONS[savedPos] || DOCK_POSITIONS.tr;
 
     const panel = document.createElement("div");
@@ -263,11 +266,17 @@
         `;
     document.body.appendChild(panel);
 
-    document.getElementById(`${PANEL_PREFIX}-collapse-btn`).addEventListener("click", toggleCollapse);
-    document.getElementById("btn-generate").addEventListener("click", handleGenerate);
+    document
+      .getElementById(`${PANEL_PREFIX}-collapse-btn`)
+      .addEventListener("click", toggleCollapse);
+    document
+      .getElementById("btn-generate")
+      .addEventListener("click", handleGenerate);
     document.getElementById("btn-apply").addEventListener("click", handleApply);
     document.getElementById("btn-clear").addEventListener("click", handleClear);
-    document.getElementById("grade-multiplier").addEventListener("input", calculateTotal);
+    document
+      .getElementById("grade-multiplier")
+      .addEventListener("input", calculateTotal);
 
     // Dock buttons
     document.querySelectorAll(`.${PANEL_PREFIX}-dock-btn`).forEach((btn) => {
@@ -286,7 +295,11 @@
       generateRows(saved.rows.length);
       const container = document.getElementById("grade-rows");
       if (container) {
-        for (let i = 0; i < saved.rows.length && i < container.children.length; i++) {
+        for (
+          let i = 0;
+          i < saved.rows.length && i < container.children.length;
+          i++
+        ) {
           const row = container.children[i];
           const nameInput = row.querySelector(".grade-criteria-name");
           const maxInput = row.querySelector(".grade-max");
@@ -406,7 +419,8 @@
       totalMax += row.max;
     }
 
-    const multiplier = parseFloat(document.getElementById("grade-multiplier")?.value) || 1;
+    const multiplier =
+      parseFloat(document.getElementById("grade-multiplier")?.value) || 1;
     const finalEarned = totalEarned * multiplier;
     const finalMax = totalMax * multiplier;
 
@@ -436,7 +450,8 @@
 
     if (lines.length === 0) return null;
 
-    const multiplier = parseFloat(document.getElementById("grade-multiplier")?.value) || 1;
+    const multiplier =
+      parseFloat(document.getElementById("grade-multiplier")?.value) || 1;
     const finalEarned = totalEarned * multiplier;
     const finalMax = totalMax * multiplier;
 
@@ -457,9 +472,14 @@
       return false;
     }
 
+    input.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+    input.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+    input.focus();
     input.value = score;
     input.dispatchEvent(new Event("input", { bubbles: true }));
     input.dispatchEvent(new Event("change", { bubbles: true }));
+    input.select();
+
     log(`Set grade to ${score}`, "success");
     return true;
   }
@@ -523,6 +543,15 @@
 
     updateStatus(`Applied: ${earned}/${max}`);
     log(`Applied ${filled.length} criteria: ${earned}/${max}`, "success");
+
+    // Auto-post the comment
+    const postBtn = document.querySelector(".save-thread-comment");
+    if (postBtn) {
+      postBtn.click();
+      log("Auto-posted comment", "success");
+    } else {
+      log("Post button not found — post manually", "warning");
+    }
   }
 
   function handleClear() {
