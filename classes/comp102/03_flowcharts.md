@@ -86,6 +86,9 @@ Create a flowchart that solves the maze with **only one** `move forward` action 
 
 So the possible actions are
 - check if front is obstructed
+- check if left is obstructed
+- check if right is obstructed
+- check if back is obstructed
 - turn right 90 degrees
 - turn left 90 degrees
 - move forward (limited to 1)
@@ -134,7 +137,7 @@ You're possible moves are
 - check the number after the current
 - compare values
 - swap
-- record swap
+- check if sorted
 
 From 
 ```
