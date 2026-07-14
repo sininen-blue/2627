@@ -80,50 +80,46 @@ Ensure the quiz as a whole spans multiple cognitive levels. Label each question:
 
 If any level is completely absent, flag it. If all questions fall into one level, flag as imbalanced. Do NOT flag if the user specified a type of exam that justifies a single level (e.g., "this is a terminology quiz").
 
-### 2. Question Clarity
+### 2. Question Clarity & Precision
 
 Flag questions that:
 - Are overly wordy (more than ~25 words for the stem)
 - Contain unnecessary clauses or qualifiers
 - Use vague language ("the thing", "the approach mentioned earlier")
+- Use vague frequency or duration terms open to subjective interpretation: `often`, `usually`, `frequently`, `rarely`, `sometimes`, `occasionally`, `commonly`, `typically`, `seldom`, `generally`, `many`, `most`, `frequent`, `common` (when used as a frequency qualifier rather than a countable adjective)
 
-### 3. No Negative Phrasing
+Vague frequency terms have no fixed threshold — one student's "often" is another's "rarely" — which undermines objective answerability. Do NOT flag if the source material itself uses the term and precise quantification is infeasible, or if the term appears in a quoted passage or is itself the subject of the question. Suggest replacing with a specific measure or removing.
 
-Flag stems containing:
-- "which is NOT", "which does NOT", "all of the following EXCEPT"
-- "which is LEAST", "what is FALSE"
-- "never", "always" (in the stem)
-- Double negatives of any kind
+### 3. No Negation
+
+No negative phrasing anywhere in the stem or options. Flag:
+- In stems: "which is NOT", "which does NOT", "all of the following EXCEPT", "which is LEAST", "what is FALSE", "never", "always", double negatives
+- In options: "Does not require X" (rewrite as "Uses Y instead"), "Is not affected by Z" (rewrite as "Operates independently of Z"), "Cannot perform W" (rewrite as "Performs V instead")
 
 Do NOT flag if the user explicitly requested negative-format questions.
 
-### 4. Self-Contained Stems
+### 4. Self-Contained
 
-The stem must make sense without reading the response options. Flag if:
+The question must make sense without reading the response options AND must be answerable from the stem and options alone — no external knowledge, hidden context, or unstated prerequisites. Flag if:
 - The stem ends with a dangling phrase that only resolves in the options
 - Pronouns refer to something only the options define (e.g., "What is this process called?")
 - The stem is a sentence fragment that needs the options to complete it
+- Answering correctly requires knowledge not supplied in the stem or options
+- The question references an acronym, concept, or scenario that is not defined or explained
+- The stem assumes a specific textbook, lecture, or reading the user may not have
+- An unstated convention or default is required to pick the right answer
 
 ### 5. Response Set Balance
 
 All 4 options should be roughly equal in length (within ~30% word count of each other). Count words per option and flag outliers.
 
-### 6. No "All / None of the above"
+### 6. No Absolute or Meta-Referential Language
 
-Flag any option that says "all of the above", "none of the above", "both A and B", "neither A nor B". These violate the independence and plausibility rules.
+Flag response options containing:
+- "all of the above", "none of the above", "both A and B", "neither A nor B" — these violate independence and plausibility rules
+- "never", "always", "every", "no X ever" — unless the source material explicitly supports that absolute claim
 
-### 7. No Absolute Language in Responses
-
-Flag response options that contain "never", "always", "every", "no X ever" — unless the source material explicitly supports that absolute claim.
-
-### 8. Positive Wording in Responses
-
-Every response option should state what IS true, not what is NOT true. Flag options phrased as:
-- "Does not require X" (rewrite as "Uses Y instead")
-- "Is not affected by Z" (rewrite as "Operates independently of Z")
-- "Cannot perform W" (rewrite as "Performs V instead")
-
-### 9. Application Over Recall
+### 7. Application Over Recall
 
 Prefer questions that ask students to apply knowledge (given scenario X, what happens?). Flag if more than half the questions are pure factual recall, unless the user specified recall-focused exam type.
 
@@ -131,12 +127,37 @@ Application question examples:
 - "A program loads 0x3F into the PC and the memory at that address contains 0x8B. Which register holds 0x8B after the fetch stage?"
 - "A CISC processor has no LOAD instruction before an ALU operation. What assumption does this make about the instruction set?"
 
-### 10. Question Independence
+### 8. Question Independence
 
 No question should depend on content from another question. Flag if:
 - Question 3 refers to "the instruction described in question 1"
 - Answering question 5 requires knowing the answer to question 4
 - Two questions overlap to the point that one spoils the other
+
+### 9. Single Dimension Responses (when applicable)
+
+The four options should vary along a single logical dimension — they can be placed on a line from most correct to least correct, not scatter across unrelated categories.
+
+Flag if:
+- Options mix qualitatively different kinds of answers (e.g., one is "what it is", another is "when it happens", another is "why it matters")
+- The options cannot be ranked or ordered along a single axis
+- The set compares apples to oranges (e.g., "cache size" vs "pipeline depth" vs "clock speed" as answers to "what improves throughput?" — all valid but belong to different dimensions)
+- The correct answer differs from distractors in *kind* rather than in *degree*
+
+Do NOT flag if:
+- The question is purely identification/definition-based (e.g., "Which component does X?") where categorical ≠ dimensional is expected
+- The user's stated exam type justifies multi-dimensional options
+
+### 10. Consistent Numeric Format
+
+When options contain numeric values, all must use the same format — same base, units, precision, and notation. Flag if:
+- Mixed bases (e.g., one option in decimal, another in hex)
+- Inconsistent units or prefixes (e.g., `100 MB` vs `1 GB` vs `1048576 bytes`)
+- Varying precision (e.g., `3.14` vs `3.14159265`)
+- Different representations of the same magnitude (e.g., `1,000` vs `1e3` vs `1024`)
+- Mixed unit scaling (e.g., `100 ms` vs `0.1 s` vs `100000 μs`)
+
+Do NOT flag if the inconsistency is intentional and task-relevant (e.g., "Convert each to decimal: A) `0xFF` B) `0b1111` C) `65`").
 
 ## Example Review Output
 
