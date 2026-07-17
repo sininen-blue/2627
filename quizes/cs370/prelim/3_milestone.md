@@ -1,18 +1,18 @@
-What operation could Blaise Pascal's Pascaline perform?
+Which statement about Blaise Pascal's Pascaline is correct?
 
-- Basic addition and subtraction
-- Multiplication and division only
-- All four arithmetic operations
-- Finite difference calculations
+- It could perform addition and subtraction mechanically
+- It could multiply and divide using repeated addition
+- It could execute all four arithmetic operations automatically
+- It could calculate finite differences for polynomial tables
 
 ---
 
-What could the Stepped Reckoner do that the Pascaline could not?
+A mathematician in 1700 needs to approximate a curve's area by summing many rectangles, requiring repeated multiplication and addition. Given the technology available in 1700, which machine is best suited?
 
-- Multiply and divide alongside adding and subtracting
-- Store programs on cards for repeated use
-- Output results onto a copper printing plate
-- Execute algorithms using finite differences
+- The Stepped Reckoner - it could multiply, divide, add, and subtract
+- The Pascaline - it could add and subtract with high precision
+- The Difference Engine — it could compute polynomial values automatically
+- The Analytical Engine — it could execute stored programs for any calculation
 
 ---
 
@@ -52,84 +52,48 @@ Who is widely considered to be the first computer programmer?
 
 ---
 
-What was the COLOSSUS designed to do?
-
-- Break the ENIGMA code during World War II
-- Calculate ballistic trajectories for artillery
-- Perform general-purpose scientific computations
-- Automate the production of mathematical tables
-
----
-
 Why did the COLOSSUS have little influence on modern computing?
 
-- It was kept classified for 30 years and was not a general-purpose computer
-- It was destroyed after the war and no documentation survived
+- It was kept classified for 30 years and remained a special-purpose computer
+- It was destroyed after the war and all documentation was lost
 - It was built using relays instead of vacuum tubes
 - It was slower than mechanical computers of the same era
 
 ---
 
-How many vacuum tubes did the ENIAC contain?
+A programming team in 1945 needs to reconfigure their ENIAC from calculating artillery tables to simulating a nuclear reaction. What must they do?
 
-- 18,000
-- 6,000
-- 30,000
-- 1,500
-
----
-
-How was the ENIAC programmed?
-
-- By flipping 6000 switches and connecting hundreds of sockets
-- By loading punched cards into a card reader
-- By typing commands into a remote terminal
-- By installing a new microprogram for each task
-
----
-
-What key insight did John von Neumann contribute to computer design?
-
-- The program itself could be stored in the computer's memory in digital form
-- Vacuum tubes could be replaced by transistors for faster operation
-- Computers should use serial decimal arithmetic for accuracy
-- Magnetic tape was the most reliable storage medium
+- Rewire cables and set thousands of manual switches
+- Load a new program from a punched-card reader
+- Type new instructions into a remote terminal
+- Install a new microprogrammed control unit
 
 ---
 
 What two changes did von Neumann propose to improve on the ENIAC's design?
 
-- Representing the program in memory and using parallel binary arithmetic instead of serial decimal
+- Storing the program in memory and switching to parallel binary arithmetic
 - Replacing vacuum tubes with transistors and adding a microprogramming layer
 - Using punched cards for input and magnetic drums for storage
 - Adding an operating system and a high-level language compiler
 
 ---
 
-Which computer first used the von Neumann architecture?
+What advantage did transistors offer that made vacuum-tube computers obsolete within a decade?
 
-- The EDSAC
-- The ENIAC
-- The COLOSSUS
-- The PDP-1
-
----
-
-What invention in 1948 made vacuum tube computers obsolete by the late 1950s?
-
-- The transistor
-- The integrated circuit
-- The silicon chip
-- The magnetic core
+- Smaller size, lower heat, and greater reliability
+- Ability to store programs in the same memory as data
+- Compatibility with existing telephone switching equipment
+- Faster arithmetic using decimal instead of binary
 
 ---
 
 What was the major innovation introduced by the PDP-8?
 
-- A single bus (omnibus) that connected components instead of a memory-centered design
-- The first implementation of the von Neumann architecture
+- A single omnibus connecting components instead of a memory-centered design
+- The first implementation of the von Neumann architecture in silicon
 - The use of integrated circuits for the arithmetic logic unit
-- The first operating system stored in read-only memory
+- The first operating system stored permanently in read-only memory
 
 ---
 
@@ -151,27 +115,9 @@ What two obstacles by the late 1990s led to the introduction of dual-core proces
 
 ---
 
-Which CPU was Intel's first mainstream dual-core architecture introduced in 2001?
-
-- The IBM POWER4
-- The Intel Pentium
-- The Intel 80386
-- The Intel 80486
-
----
-
 What did IBM publish alongside the IBM Personal Computer that helped start the PC industry?
 
-- The machine's design was made available for $49 so other companies could make plug-in boards
+- The machine's design was published for $49 so others could build plug-in boards
 - The source code for MS-DOS was released to the public for free
 - The Intel 8088 processor specifications were shared with all manufacturers
 - A complete assembly language manual was bundled with every computer
-
----
-
-Why did IBM create the System/360 as a family of compatible machines?
-
-- Customers had incompatible machines and wanted a single product line where programs could run across models
-- The company needed to reduce manufacturing costs by using the same parts for all models
-- Competitors had already released compatible families and IBM was falling behind
-- The US government required IBM to standardize its product line for defense contracts
