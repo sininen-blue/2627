@@ -1,18 +1,9 @@
 You are designing a CPU and need to choose how many registers to include. Adding more registers increases chip area and cost but reduces how often the CPU must read from main memory. Which RISC principle directly addresses this trade-off?
 
 - Provide abundant registers to minimize waiting on slow system memory
-- Keep instructions at a fixed length for easy decoding
-- Maximize the issue rate through optimized pipelining
+- Keep all instructions at a single fixed length for straightforward decoding
+- Maximize the overall instruction throughput through deeply optimized pipelining
 - Isolate memory access to only explicit LOAD and STORE instructions
-
----
-
-A CPU currently takes 2 nanoseconds for its data path cycle (register read → ALU operate → register write). What is the maximum clock speed this CPU can achieve?
-
-- 500 MHz
-- 200 MHz
-- 2 GHz
-- 1 GHz
 
 ---
 
@@ -29,8 +20,8 @@ A team is designing a processor for a space probe. The mission will last 15 year
 
 - Use microprogramming so the multiplication logic can be fixed via a microcode update
 - Use a pure RISC design so all instructions execute directly in hardware
-- Use a single-cycle CISC design to minimize total instruction count
-- Use a hardwired control unit to eliminate software layers entirely
+- Use a single-cycle CISC design to minimize the total number of instructions
+- Use a hardwired control unit to eliminate all software abstraction layers
 
 ---
 
@@ -46,17 +37,17 @@ IBM wants to sell both a cheap low-end mainframe and an expensive high-end mainf
 You are writing a multiply function for a RISC processor that has no `MULT` instruction. You have registers `R1` and `R2` containing the operands. Which sequence of instructions correctly computes their product?
 
 - A loop adding R2 into a result register while decrementing R1
-- A single instruction `MULT R1, R2` that the ALU executes directly
+- A single `MULT R1, R2` instruction that the ALU executes directly in hardware
 - A memory-to-memory copy followed by a hardware multiplication signal
-- A microcode call that invokes the hidden multiplier circuit
+- A microcode subroutine call that invokes the hidden hardware multiplier
 
 ---
 
 A processor designer notices that 90% of instructions in typical programs are simple loads, stores, and adds, while the remaining 10% are complex operations. Based on this observation, should they design a CISC or RISC processor?
 
-- RISC, because optimizing the fast path for simple instructions yields better overall performance
-- CISC, because handling the complex 10% efficiently is more important for correctness
-- CISC, because simple instructions already execute at maximum speed on any design
+- RISC, because of better overall performance
+- CISC, because handling the complex instructions efficiently is more important for speed
+- CISC, because simple instructions already execute at high speeds
 - RISC, because fixed-length instructions prioritize decoding speed over complexity
 
 ---
@@ -83,7 +74,7 @@ A processor has a data path that takes 1 nanosecond per cycle. You can either ad
 
 - Hardware: 1 cycle at 1.2 ns finishes faster than 5 cycles at 1 ns
 - Microcode: 5 cycles at 1 ns finishes faster than 1 cycle at 1.2 ns
-- The hardware implementation, because it eliminates the need for microcode entirely
+- Choose the hardware implementation, because it eliminates the need for microcode entirely
 - The microcode implementation, because longer data paths cause pipeline hazards
 
 ---
@@ -115,15 +106,6 @@ You are choosing a processor for a battery-powered smartphone. Which architectur
 
 ---
 
-A company's legacy software was compiled for a CISC architecture that is now obsolete. They want to run it on a new RISC machine without modifying the binary. What approach allows this?
-
-- Write an emulator that interprets legacy CISC instructions on RISC hardware
-- Recompile the source code with a RISC-targeting compiler
-- Microprogram the RISC processor to accept CISC instructions directly
-- Add a CISC coprocessor to the RISC chip as a separate core
-
----
-
 During the Fetch stage of the instruction cycle, what specifically happens to the Program Counter?
 
 - It is updated to point to the next sequential instruction
@@ -133,45 +115,9 @@ During the Fetch stage of the instruction cycle, what specifically happens to th
 
 ---
 
-A RISC processor has 32 general-purpose registers. A CISC processor has 8. A program spends 20% of its time spilling register values to memory on the RISC machine and 50% on the CISC machine. Assuming all other factors are equal, which processor likely performs better on this program?
-
-- RISC, because fewer register spills mean less time waiting on memory
-- CISC, because 8 registers are sufficient if instructions can operate on memory directly
-- RISC, because 32 registers means the clock cycle is shorter
-- CISC, because spilling to memory is faster on a CISC architecture
-
----
-
 A startup is building a custom accelerator for AI inference. They want to minimize design complexity and leverage open standards. Which instruction set architecture should they choose?
 
 - RISC-V, an open-standard RISC ISA expanding across the industry
 - x86, because it has the largest software ecosystem and toolchain support
 - ARM, because it dominates mobile and offers the best licensing terms
 - CISC, because complex matrix instructions reduce code size for neural networks
-
----
-
-A computer fetches an instruction from address `0x1000`, decodes it, and discovers it is a branch that needs to jump to `0x2000`. At what point in the instruction cycle does the Program Counter change from `0x1001` to `0x2000`?
-
-- During Execute when the control unit updates the PC with the branch target
-- During the Fetch phase when the instruction is copied into the Instruction Register
-- During the Decode phase when the CPU identifies it as a branch instruction
-- Before the Fetch phase when the branch prediction unit pre-loads the target
-
----
-
-A RISC processor follows the principle that only LOAD and STORE instructions interact with memory. What is the consequence of this design rule?
-
-- All arithmetic operands must already be in registers before the operation starts
-- Memory access is slower because every access goes through the register file
-- The compiler struggles to optimize memory references in inner loops
-- The ALU must contain its own dedicated cache for arithmetic operands
-
----
-
-You are comparing two CPUs: CPU A completes the data path cycle in 0.5 ns; CPU B completes it in 1 ns but can execute two instructions per cycle. Which processor has higher theoretical throughput?
-
-- CPU A: 0.5 ns per instruction gives 2 billion instructions per second
-- CPU B: 2 instructions per cycle at 1 ns gives 2 billion instructions per second
-- CPU A, because shorter clock cycles result in higher throughput
-- CPU B, because dual-issue doubles the effective clock speed to 2 GHz
