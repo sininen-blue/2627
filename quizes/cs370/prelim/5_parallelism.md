@@ -54,7 +54,7 @@ A research team is building a system for weather forecasting that requires scali
 
 Five CPUs share a bus to access main memory. As more CPUs are added, the bus becomes saturated and performance stops improving. What bottleneck does this describe?
 
-- A shared bus bottleneck from heavy traffic reducing performance
+- A shared bus bottleneck, because all CPUs contend for the bus simultaneously
 - A register dependency, because CPUs wait for each other's register writes to complete
 - A data hazard, because instructions read and write the same memory locations out of order
 - A network congestion problem, because messages between CPUs overflow the buffer
@@ -70,7 +70,7 @@ In a 5-stage pipeline, instruction I1 is at S5 (Write Back) while I2 is at S4 an
 
 ---
 
-A cake factory has 5 workers. One worker places a box, another puts in the cake, a third seals it, a fourth labels it, and a fifth removes it. Without pipelining, one box takes 50 seconds. With the assembly line, a finished box comes off every 10 seconds. What does this 10 seconds represent?
+A 5-worker assembly line produces a finished box every 10 seconds compared to 50 seconds without pipelining. What does the 10 seconds represent?
 
 - The throughput interval, matching the time of the slowest single stage
 - The total latency, which equals the sum of all five stages
@@ -133,15 +133,6 @@ A cloud server runs a database that frequently reads and writes shared data stru
 
 ---
 
-A scientific application is embarrassingly parallel: 10,000 independent tasks with no communication between them. The team has a budget for 100 identical computers connected by a network. How should they deploy the application?
-
-- As a multicomputer, splitting tasks across the 100 computers and collecting results
-- As a multiprocessor, because shared memory requires fewer changes to the application code
-- As a data parallel GPU kernel, because GPUs outperform CPUs for scientific workloads
-- As a single superscalar workstation, because out-of-order execution handles it efficiently
-
----
-
 A graphics rendering engine applies a lighting calculation to each of 4 million pixels. Each pixel's calculation is independent. Which bottleneck is most likely to limit performance on a data parallel computer?
 
 - Memory bandwidth from many processors requesting pixel data simultaneously
@@ -160,84 +151,12 @@ Consider a 5-stage pipeline executing a program where half the instructions are 
 
 ---
 
-A processor has two ALUs and one FPU. In a given cycle, three instructions arrive: an integer add, an integer multiply, and a floating-point divide. Which instructions can execute simultaneously?
-
-- Integer add and multiply in the two ALUs while the FP divide waits
-- All three, because the integer operations share one ALU and the FPU handles the divide
-- Only one, because each execution unit handles one instruction type at a time
-- The floating-point divide alone, because integer operations stall on register access
-
----
-
-You have a choice between two processors for a video game: Processor A is a single fast core, Processor B is a multicomputer with 8 slower cores connected by a network. The game has heavy real-time interaction between game entities. Which is likely the better choice?
-
-- Processor A, because a single core avoids communication overhead of distributed memory
-- Processor B, because 8 cores outperform 1 core regardless of workload
-- Processor A, because multicomputers struggle with real-time applications
-- Processor B, because network latency is negligible for video games
-
----
-
 A multiprocessor system with 16 CPUs accessing shared memory is running a parallel sort. Processors spend 30% of their time waiting for memory access. What is the primary cause?
 
 - Multiple processors competing for the same main memory causes access delays
 - The sort algorithm has too many data dependencies between CPUs
 - The pipeline is too deep for the sort's instruction mix
 - The CPUs are superscalar and struggle with branch-heavy sort code
-
----
-
-A processor executes four instructions per cycle. After a branch misprediction, it must discard all instructions fetched after the branch and restart. Approximately how many cycles of work are wasted?
-
-- Up to the number of instructions fetched ahead, depending on pipeline depth and fetch width
-- Exactly one cycle, because only the branch instruction itself is flushed
-- Zero cycles, because superscalar processors have accurate branch prediction
-- All instructions in the reorder buffer, which is typically hundreds of entries
-
----
-
-A startup is designing a chip for AI inference. Most of their workload is matrix multiplications on large grids of floating-point numbers. Should they prioritize a data parallel (SIMD) design or a superscalar out-of-order design?
-
-- Data parallel SIMD, because the same operation applies to many data elements simultaneously
-- Superscalar out-of-order, because it extracts more ILP from AI inference code
-- Data parallel SIMD, because it reduces memory bandwidth bottlenecks
-- Superscalar out-of-order, because matrix multiplication has unpredictable control flow
-
----
-
-In a multicomputer, Processor A needs a value computed by Processor B. How does Processor A obtain this value?
-
-- Processor B sends a message containing the value over the network
-- Processor A reads Processor B's memory directly through the shared bus
-- Processor B writes the value to shared memory that both can access
-- Processor A computes the value locally by simulating Processor B's work
-
----
-
-A database server uses a multiprocessor with eight cores sharing RAM. One core updates a record while another reads it. What must the system do to prevent the read from getting stale data?
-
-- Coordinate access to shared data to prevent conflicts
-- Give each core its own private copy of the entire database
-- Disable caching on all cores to ensure memory coherence
-- Route all database operations through a single core
-
----
-
-A pipelined processor runs at 3 GHz and completes one instruction per cycle after the pipeline fills. A non-pipelined version of the same processor takes 5 cycles per instruction. How many MIPS does each achieve?
-
-- Pipelined: 3000 MIPS; Non-pipelined: 600 MIPS
-- Pipelined: 3000 MIPS; Non-pipelined: 3000 MIPS
-- Pipelined: 600 MIPS; Non-pipelined: 600 MIPS
-- Pipelined: 600 MIPS; Non-pipelined: 3000 MIPS
-
----
-
-A program consists entirely of independent instructions with no data dependencies. On a superscalar processor that issues 4 instructions per cycle, how much faster will it run compared to a scalar processor at the same clock frequency?
-
-- Up to 4 times faster, because all 4 issue slots can be filled every cycle
-- Exactly 4 times faster, because the clock frequency is the same
-- Slightly less than 4 times faster, because fetch and decode stages limit throughput
-- Exactly 1 time faster, because instruction-level parallelism does not affect independent code
 
 ---
 
@@ -256,15 +175,6 @@ Two instructions in a program have a Read-After-Write dependency: I1 writes to R
 - Yes, as long as both instructions are fetched in the same cycle
 - Yes, because register renaming eliminates most data hazards automatically
 - No, because RAW dependencies only occur in pipelined processors, not superscalar
-
----
-
-A company migrates a single-threaded legacy application to a modern superscalar processor. Without recompiling, the application runs faster. Why?
-
-- The superscalar processor extracts instruction-level parallelism from the existing instruction stream
-- The superscalar processor automatically splits the application across multiple cores
-- The higher clock frequency of the new processor is the only factor
-- The superscalar processor uses SIMD to vectorize the legacy code at runtime
 
 ---
 
