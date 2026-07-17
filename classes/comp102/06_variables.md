@@ -18,7 +18,7 @@ In the context of *Computer Science* variables are a **name** with an associated
 
 ---
 
-## patterns with variables
+## Patterns with variables
 
 We'll look at some common ways to use variables in Scratch
 
@@ -276,4 +276,98 @@ layout: center
 
 ## Pattern 4: Max Tracker (High Score)
 
-We'll add a high score to our game, if we click the flag, the score resets but the high score 
+We'll add a high score to our game. If we click the flag, the score resets but the high score stays until we close the browser.
+
+---
+
+## Pattern 5: Configuration Bundle
+
+**The problem:** How do you make the game *feel* right?
+
+Player movement uses multiple connected values:
+- `speed` — how fast you move sideways
+- `jumpForce` — how high you go
+- `gravity` — how fast you come back down
+
+These variables form a **system** — change one, and the whole feel of the game changes.
+
+---
+
+## Pattern 5: Configuration Bundle
+
+```text
+╭─ event ─────────────────────────────────╮
+│  when [flag v] clicked                  │
+├─ variables ─────────────────────────────┤
+│  set [speed v] to [5]                   │
+├─ variables ─────────────────────────────┤
+│  set [jumpForce v] to [12]              │
+├─ variables ─────────────────────────────┤
+│  set [gravity v] to [1]                 │
+╰─────────────────────────────────────────╯
+
+╭─ control ───────────────────────────────╮
+│  forever                                │
+│  ┌─ motion ──────────────────────────┐  │
+│  │  change x by [speed]              │  │
+│  │  change y by [jumpForce]          │  │
+│  │  change y by [-gravity]           │  │
+│  └───────────────────────────────────┘  │
+╰─────────────────────────────────────────╯
+```
+
+These variables are used **inside other blocks** — they control how the sprite moves.
+
+---
+
+## Pattern 5: Configuration Bundle
+
+Different preset combinations produce completely different game feel:
+
+| speed | jumpForce | gravity | Feel |
+|:-----:|:---------:|:-------:|------|
+| 3 | 8 | 0.5 | Floaty, slow moon-jump |
+| 5 | 12 | 1 | Standard platforming |
+| 8 | 15 | 2 | Fast, heavy |
+
+The variables work as a **coordinated system** — real game developers tune these together to get the right feel.
+
+---
+
+## Pattern 5: Configuration Bundle
+
+Variables aren't just for tracking, they're **settings** you can tweak.
+
+This bundle pattern is especially useful because:
+- All tuning values are in **one place** (not scattered across blocks)
+- You can **experiment** quickly by changing one number
+- Other developers can understand your game's feel at a glance
+
+---
+layout: center
+---
+
+## Pattern 5: Configuration Bundle
+
+We'll add speed, jumpForce, and gravity to our game.
+
+Find a combination that feels fun to play with.
+
+---
+
+## Summary: What all 5 patterns share
+
+Each pattern is the same core idea:
+
+> A **named box** (variable) whose **contents change** over time.
+
+The pattern is defined by *what* changes the value and *when*.
+
+| Pattern | What changes the value | When |
+|---------|----------------------|------|
+| **Counter** | Event | Each time event occurs |
+| **Countdown** | Loop iteration | Each second until 0 |
+| **Flag** | Game event | When state transitions |
+| **Max Tracker** | Another variable | When it exceeds current |
+| **Bundle** | No change (it *drives*) | At start, then read only |
+
