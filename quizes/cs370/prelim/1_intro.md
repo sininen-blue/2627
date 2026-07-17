@@ -34,7 +34,7 @@ What is formed when primitive instructions together create a language?
 
 ---
 
-What happens whenever a level becomes tedious and difficult to use?
+What happens when a level becomes tedious and difficult to use?
 
 - An abstraction is made
 - The hardware is redesigned
@@ -61,7 +61,7 @@ What is the main method where an L0 program reads an L1 program and translates i
 
 ---
 
-In translation, which component is in control of the final L0 program?
+When a program is translated from one level to another, which component controls the final program?
 
 - The machine hardware
 - The L1 source code
@@ -72,23 +72,23 @@ In translation, which component is in control of the final L0 program?
 
 In the virtual machine model, what does M0 represent?
 
-- A virtual machine with a physical counterpart
+- A hardware-implemented virtual machine
 - The operating system kernel
 - The assembly language interpreter
 - The problem-oriented runtime
 
 ---
 
-What kind of gap must exist between languages L0 and L1 to make the multilevel approach work?
+In the multilevel machine model, what kind of gap must exist between a language and the language that implements it?
 
-- They must be similar enough to bridge with limited translation
+- Similar enough to bridge with limited translation
 - They must be completely unrelated in syntax
 - They must share identical instruction sets
 - They must be implemented in the same hardware
 
 ---
 
-How many levels do most modern computers typically have?
+How many levels does a modern computer have?
 
 - Two or more levels
 - Exactly five levels
@@ -108,7 +108,7 @@ What is at Level 0 of the contemporary multilevel machine?
 
 What are the circuits at the Digital Logic Level built from?
 
-- Gates built from analog components like transistors
+- Gates built from switching transistors
 - Registers connected by a data bus
 - ALUs arranged in a pipeline
 - Magnetic cores and vacuum tubes
@@ -133,7 +133,7 @@ What forms a data path at the Microarchitecture Level?
 
 ---
 
-What does every computer manufacturer publish for its ISA Level?
+What does a computer manufacturer publish for its ISA Level?
 
 - A machine language reference manual
 - A high-level programming guide
@@ -151,12 +151,12 @@ What instructions does the Operating System Level add beyond the ISA Level?
 
 ---
 
-What is the key difference between levels 1-3 and level 4?
+In the contemporary multilevel machine, what distinguishes the lower machine levels from the Assembly Language level?
 
-- Levels 1-3 are numeric and level 4 uses symbols
-- Levels 1-3 are software and level 4 is hardware
-- Levels 1-3 are fast and level 4 is slow
-- Levels 1-3 are abstract and level 4 is physical
+- The lower levels use numeric machine language, the Assembly Language level uses symbols
+- The lower levels are software, the Assembly Language level is hardware
+- The lower levels are fast, the Assembly Language level is slow
+- The lower levels are abstract, the Assembly Language level is physical
 
 ---
 
@@ -171,7 +171,7 @@ What tool converts assembly language into numeric machine code?
 
 What is the difference between architecture and implementation?
 
-- Architecture is visible to the user; implementation is how features are realized
-- Architecture is how features are realized; implementation is visible to the user
+- Architecture is user-visible; implementation realizes features
+- Implementation is user-visible; architecture realizes features
 - Architecture refers to hardware; implementation refers to software
 - Architecture defines performance; implementation defines cost
