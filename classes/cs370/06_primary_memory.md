@@ -276,4 +276,354 @@ Little-Endian has largely won the *consumer hardware war*.
 
 ---
 
+# Error Correcting Codes
+
+---
+
 ## Error Correcting Codes
+
+Electricity and voltage are not reliably stable, voltage spikes, cosmic rays, another appliance being plugged in
+
+All of these can cause memory to make errors, which is why error correcting codes exist
+
+Similar to how a qr has more data than required, extra bits are added to each memory word in a special way to
+
+1. check if an error has occurred
+2. fix that error if possible
+
+---
+
+## What is an error
+
+suppose you have a memory word consisting of $m$ data bits
+
+we will add $r$ redundant, or *check*, bits
+
+so the total length is $n = m + r$
+
+> An $n$-bit unit containing $m$ data and $r$ check bits is often reffred to as an
+
+**$n$-bit codeword**
+
+---
+
+## What is an error (cont)
+
+given any two codewords
+
+```
+1000 1001 and
+1011 0001
+```
+
+It is possible to determine how many corresponding bits differ using *exclusive or*
+
+```
+1000 1001 xor
+1011 0001
+---------
+0011 1000
+```
+
+And simply counting how many 1 bits are in the result
+
+This is called **Hamming distance**
+
+---
+
+## Hamming distance
+
+if we assume that two codewords are $d$  hamming distance apart, it will *require* $d$ single bit errors to convert one into another 
+
+fox example
+
+```
+1111 0001
+0011 0000
+---------
+0011 0001
+```
+
+3 hamming distance apart, meaning it will take 3 errors to convert one into another
+
+---
+
+## error detection
+
+if we assume
+- 3 $m$ bits (data)
+- 2 $r$ bits (check)
+- 5 $n$ bits (total)
+
+all $2^m$ bit patterns are legal ($2^3$)
+
+```
+000 001 010 011 100 101 110 111
+```
+
+but with check bits, because of how they are computed, only $2^m$ of the $2^n$ bits are valid
+
+```
+data check valid
+000  00    00000
+001  01    00101
+```
+
+but
+
+```
+data check invalid
+001  00    00100
+```
+
+so if a memory read turns out an invalid codeword, the computer knows that a memory error has occured
+
+---
+
+## Error detection
+
+Given the algorithm for computing check bits, it is possible to construct a complete list of the legal coderods, and from this list
+
+we can fined the two code words whose hamming distance is minimum
+
+and this distance is the hamming distance of the complete code
+
+the ability for a code to *detect* and *correct* errors depend on this hamming distance
+
+---
+
+## Error correction
+
+to *detect* $d$ single bit errors, you need a minimum distance of $d + 1% to another valid codeword
+
+because if you have a code like that, the only way a legal codeword can change into another legal codeword is with $>d$ errors 
+
+And if you want to correct a code, you'd need $2d + 1$ distance, so that all legal coedwarsds are so war apart that even $d$ changes  the original codeword is still closer than any other codeword
+
+---
+
+## Parity bit
+
+A simple example of an error detecting code is a *parity bit* 
+
+The parity bit is chosen so that the number of 1 bits in the codeword is even (or odd)
+
+This code has a distance of $2$, since any isngle bit error produces a codeword with the wrong parity
+
+so it would take two single bit errors to go from a vlaid codeword to another valid codeword
+
+So if it detects a word containing the wrong arity when pulling from memory, an error happens
+
+the program can't continue but no incorrect rustles are computed
+
+---
+
+## Error Correction
+
+consider a code with only four valid codewords
+
+```
+00000 00000
+00000 11111
+11111 00000
+11111 11111
+```
+
+This code has a distance of 5, which means it can *correct* double errors ($(2*2) + 1 = 5$)
+
+so if `00000 00111` arrives, the reciever knows that the orginal must be `00000 11111` since that's the closest
+
+but if we had a 3 bit error so `00000 00000` turns into `00000 00111` we can't correct it
+
+---
+
+## Exercise
+
+1. Given the data word `1011`, compute its **even parity bit**. What is the full codeword?
+
+2. Compute the **odd parity bit** for the data word `0110`. What is the full codeword?
+
+3. Calculate the **Hamming distance** between the following pairs of codewords:
+   - `100110` and `101010`
+   - `111000` and `000111`
+   - `01010101` and `01010101`
+
+4. A code uses only these four valid codewords:
+   ```
+   000111
+   111000
+   001110
+   110001
+   ```
+   What is the minimum Hamming distance of this code? How many bit errors can it **detect**? How many can it **correct**?
+
+5. A memory read returns `10110`. The valid codewords are `10101`, `01010`, `11100`, and `00011`. Assuming single-bit error correction, what was the most likely transmitted codeword? What is the extracted data?
+
+---
+
+## Scenario
+
+say we want to design a code with $m$ data bits and $r$ check bits that will allow **all single bit errors** to be corrected
+
+so each of the $2^m$ legal memory words has $n$ illegal codewords at a distance 1 from it
+
+thus each of the $2^m$ legal memory worlds require $n + 1$ bit patterns dedicated to it (1 correct, and 1 for every bit being flipped)
+
+```
+000
+
+001
+010
+101
+```
+
+---
+
+## Scenario
+
+we know that there are $2^m$ legal dat aowrds
+
+if every one of those $2^m$ words requires its own unique neighbor of $n + 1$ patterns
+
+we need
+
+$(n + 1)2^m$
+
+---
+
+## Scenario
+
+Then, since a meomry slot of $n$ bits can only hold a maximum of $2^n$ unique combinations
+
+our total required "reserved" patterns cannot exceed the total number of physically availble pattersn
+
+$$
+(n + 1) 2^m \leq 2^n
+$$
+
+since we know that the total codeword tlenght is $n = m + r$
+
+we can substitue
+
+$$
+\begin{aligned}
+(m + r + 1)2^m &\leq 2^{m+r} \\
+(m + r + 1)2^m &\leq 2^m \cdot 2^r \\
+m + r + 1 &\leq 2^r
+\end{aligned}
+$$
+
+This is saying that if we choose a data word size $m$, we can find the absolut minimum number of check ibts ($r$) required to achiceve single error correction
+
+---
+
+## Scenario
+
+| Word size | Check bits | Total size | Percent overhead |
+|-----------|-----------|------------|-----------------:|
+| 8         | 4         | 12         |              50% |
+| 16        | 5         | 21         |              31% |
+| 32        | 6         | 38         |              19% |
+| 64        | 7         | 71         |              11% |
+| 128       | 8         | 136        |               6% |
+| 256       | 9         | 265        |               4% |
+| 512       | 10        | 522        |               2% |
+
+---
+
+## Visual
+
+Let's look at the error correcting code for 4 bit words
+
+<img src="https://i.imgur.com/xtBXIjj.png" class="mt-4 mx-auto rounded w-2/4">
+
+If we encode `1100` in the regions $AB, ABC, AC$ and $BC$, with 1 bit per region (alphabetical order)
+
+we get figure a
+
+---
+
+## Visual
+
+<img src="https://i.imgur.com/xtBXIjj.png" class="mt-4 mx-auto rounded w-2/4">
+
+Then we add a parity bit to each of the three empyt regions to produce even parity (b)
+
+So, the sum of the  bits in each of the three circles $A, B,$ and $C$ is now an even number
+
+This figure corresponds to a codeword with 4 data bits and 3 parity bits
+
+---
+
+## Visual
+
+<img src="https://i.imgur.com/xtBXIjj.png" class="mt-4 mx-auto rounded w-2/4">
+
+if the region in $AC$ goes bad, (0 to 1), the computer can now see that circles $A$ and $C$ have the wrong parity
+
+The only single bti chang ethat corrects them is to restore AC back to $0$ thus correct ing hte error
+
+So single bit erros repair automatically
+
+---
+
+## Hammings algorithm
+
+we can use hammings algorithm to construct error correcting codes for any size memory word
+
+in a hamming ocde $r$ parity bits are added to an $m$ bit word forming $m + r$ bits
+
+the bits are numberd starting at 1 with bit 1 being hte left most
+
+all bits whose number is a power of 2 are parity bits, the rest are data
+
+for example a 16bit word, 5 parity bits are added
+
+`1 2 4 8 and 16` will become parity bits, the rest are data
+
+so the memory wword has 21 bits (16 data 5 parity)
+
+---
+
+## In an even parity exmaple
+
+each parity bit checks specific bit positions, the parity bit is set so that the total number of 1s in the checked posisions is even
+
+```
+bit 1 checks bits 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21
+bit 2 checks bits 2, 3, 6, 7, 10, 11, 14, 15, 18, 19
+bit 4 checks bits 4, 5, 6, 7, 12, 13, 14, 15, 20, 21
+bit 8 checks bits 8, 9, 10, 11, 12, 13, 14, 15
+bit 16 checks bits 16, 17, 18, 19, 20, 21
+```
+
+ in genreal, each bit $b$ is check by those bits $b_1, b_2, ..., b_j$ such that $b_1 + b_2 + ... + b_j = b$
+
+so bit 11 is 8 + 2 + 1, so it's checked by parity bit 8 2 and 1
+
+---
+
+## In an even parity example
+
+given a hamming ocde for 16 bit memory with a 21 bit codeword
+
+<img src="https://i.imgur.com/KsXKoYc.png" class="mt-4 mx-auto rounded w-2/4">
+
+consider if 5 bits were inverted
+
+```
+0010 1110 0000 1011 0111 0 original
+0010 0110 0000 1011 0111 0 error
+```
+
+Parity bit 1 incorrect (1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21 contain five 1s).
+Parity bit 2 correct (2, 3, 6, 7, 10, 11, 14, 15, 18, 19 contain six 1s).
+Parity bit 4 incorrect (4, 5, 6, 7, 12, 13, 14, 15, 20, 21 contain five 1s).
+Parity bit 8 correct (8, 9, 10, 11, 12, 13, 14, 15 contain two 1s).
+Parity bit 16 correct (16, 17, 18, 19, 20, 21 contain four 1s).
+
+to find the incorrect ibts, first compute all the parity bits then add up all incorrect parity bits, starting at 1
+
+1 + 4 + 16
+
+---
