@@ -1,5 +1,6 @@
 ---
 title: 06 variables
+theme: ../../theme
 exportFilename: exports/comp102/06_variables
 lineNumbers: true
 ---
