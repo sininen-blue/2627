@@ -316,8 +316,12 @@ When Python sees an expression, it **evaluates** it — reduces it down to a sin
 >>> 5 > 3
 True
 
->>> (2 + 3) * 4
+>>> x
+whatever value x is
+
+>>> (x + 3) * 4
 20
+
 ```
 
 Python works **inside out**, it evaluates the innermost parts first, then works its way up. 
