@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         NeoLMS Worksheet Grader
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  Bulk grade worksheet assignments with rubric rows
 // @match        https://urios.neolms.com/teacher_dropbox_assignment/grade/*
+// @match        https://urios.neolms.com/teacher_team_assignment/grade/*
 // @grant        none
 // ==/UserScript==
 
@@ -205,6 +206,23 @@
                             overflow-y: auto;
                             padding-right: 4px;
                         "></div>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <div style="font-size: 11px; color: #aaa; margin-bottom: 2px;">Comments</div>
+                        <textarea id="grade-comments" placeholder="Freeform comments..." style="
+                            width: 100%;
+                            min-height: 60px;
+                            padding: 6px 8px;
+                            border: 1px solid #333;
+                            border-radius: 4px;
+                            background: #111;
+                            color: #fff;
+                            font-family: monospace;
+                            font-size: 12px;
+                            box-sizing: border-box;
+                            resize: vertical;
+                        "></textarea>
                     </div>
 
                     <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center;">
@@ -462,6 +480,13 @@
       lines.push(`Total: ${finalEarned}/${finalMax}`);
     }
 
+    const commentsEl = document.getElementById("grade-comments");
+    const freeform = commentsEl?.value.trim();
+    if (freeform) {
+      lines.push("");
+      lines.push(freeform);
+    }
+
     return lines.join("\n");
   }
 
@@ -567,6 +592,8 @@
       if (earned) earned.value = "";
     }
 
+    const commentsEl = document.getElementById("grade-comments");
+    if (commentsEl) commentsEl.value = "";
     const multiplier = document.getElementById("grade-multiplier");
     if (multiplier) multiplier.value = "1";
 

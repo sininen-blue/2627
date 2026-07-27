@@ -8,7 +8,25 @@ lineNumbers: true
 
 ---
 
-# python is a high levl language
+# What is python
+
+Python is a high level, interpreted, object oriented, general purpose programming language that emphasizes readability and developer ease of use
+
+It also has a repl, and runs through a virtual machine
+
+---
+
+## "levels" in programming languages
+
+A "level" in proramming language isn't a formal definition, depending on your field and the context
+
+C could be high level, fortran could be high level, assembly could be high level
+
+But genrally it means that a language is farther away from what a computer can do
+
+remeber that a computer can only do very simple things
+
+python can do *very* complex things very easily, not because it's not limited by the same limitaitons, but becuaes every singl python action is just a really really long series of simple actions
 
 ---
 
