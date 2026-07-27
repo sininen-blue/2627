@@ -256,86 +256,245 @@ if x < -20:
 
 ---
 
-# operations
+## Variables
 
-```
-+ - * /
+A **variable** is a named *box* that holds a value. 
+
+Think of it like a Scratch variable, same idea, different syntax.
+
+```python
+name = value
+
+x = 20
+message = x
+message = "hello"
 ```
 
-```
-!= == >= > < <=
+In Scratch you drag blocks. Here you **type**
+
+But the concept is identical: **a label that points to a piece of data**.
+
+Variables let you *store*, *reuse*, and *change* data throughout your program. 
+
+Instead of hardcoding `20` everywhere, you write `x = 20` once and use `x`. Change `x` in one place, it updates everywhere.
+
+---
+layout: center
+---
+
+# Expressions and Evaluations
+The core of and basically any programming language
+
+---
+
+## Expression
+
+An **expression** is any piece of code that **produces** a value.
+
+```python
+2 + 2            # 4
+"hello"          # "hello"
+5 > 3            # True
+x * 10           # depends on what x is
 ```
 
-```
-% //
-```
+If it **evaluates to something**, it's an expression. 
+
+- A single number like `42` is an expression. 
+- `42 + 8` is also an expression
 
 ---
 
 ## Evaluation (and how data gets processed)
 
+When Python sees an expression, it **evaluates** it — reduces it down to a single value.
+
+```python
+>>> 2 + 3
+5
+
+>>> 5 > 3
+True
+
+>>> (2 + 3) * 4
+20
+```
+
+Python works **inside out**, it evaluates the innermost parts first, then works its way up. 
+
+This is called the **order of operations** (PEMDAS still applies).
 
 ---
 
-# output (and also functions)
+## Operations
 
+Operations in Python fall into two categories.
+
+1. Arithmetic - produces a `number`
+
+```python
++   -   *   /        # add, subtract, multiply, divide
+%                    # modulo (remainder) — 10 % 3 → 1
+//                   # floor division — 10 // 3 → 3
 ```
-print()
+
+`%` is useful for checking even/odd (`x % 2 == 0` means even) or wrapping around a range.
+
+2. Comparison - produces `True`/`False`
+
+```python
+==   !=     # equal, not equal
+>    <      # greater than, less than
+>=   <=     # greater/less than or equal
 ```
-
-think of this as a box (function) with two holes, one on the left and one on the right
-
-you put someting in the left whole
-
-then you get osmething out of the right whole
 
 ---
 
-# data types
+## Exercise
 
-What is the difference between e letter and a number (in real life)
+```python
+10 + 5 * 2
+17 % 5
+17 // 5
+(2 + 3) >= 5
+(10 % 3) * (8 // 3) + 1
+"py" + "thon" + " " + "3"
+5 > 3 and 10 < 20
+```
 
+You are allowed to use online python interpreters to solve these
 
-if you think of operatiosn as boxes sometimes boxes have different shaped holes
+https://www.pythonmorsels.com/repl/
+
+---
+layout: two-cols-header
+---
+
+## The first output function, and how functions work
+
+::left::
+```python
+print("hello")
+print(42)
+print(2 + 3)
+```
+
+Think of `print()` as a **box**
+
+The box has:
+- a *name* on the front (print)
+- 2 holes on either side
+- a person inside
+- *instructions* that the person will follow
+
+All you're doing is putting something into the left hole, and waiting for something to come out the right hole
+
+::right::
+
+```mermaid
+flowchart LR
+    input
+    process
+    output
+    input --> process --> output
+```
+
+> Note that `print()` doesn't actually have output
+
+Prints instructions are to get whatever the input is, and then write it out, but it **doesn't** return a value
+
+If you were to evaluate this line
+
+```python
+5 + print("hello")
+```
+
+The program would *say* `hello`, then it would try to add `5` and a `None` since print doesn't evaluate to anything
 
 ---
 
-# variables
+## Data Types
 
-scratch equivalence
+In real life, a **letter** and a **number** behave differently, you can add numbers but you can't add letters. 
 
-main difference
+> Python is the same.
 
-box
+Every value in Python has a *type* that determines *what you can do with it*.
 
+You can use the `type()` function to figure out what the type of a specific value is
+
+```python
+type(42)       # <class 'int'>
+type(3.14)     # <class 'float'>
+type("hi")     # <class 'str'>
+type(True)     # <class 'bool'>
 ```
-name = value
-x = 20
-```
-
-different types
-
-main strength
-
-you can use them for everything
 
 ---
 
-# if statements
+## Data types (cont)
 
-it's another box
+| Type | Name | Example | What you can do |
+|---|---|---|---|
+| `int` | Integer | `42` | `+ - * / % //` |
+| `float` | Decimal | `3.14` | `+ - * /` (math with decimals) |
+| `str` | String (text) | `"hello"` | `+` (concatenate), `*` (repeat) |
+| `bool` | Boolean | `True` / `False` | `and`, `or`, `not` |
 
+---
+
+## Data types (cont)
+
+Mixing types can cause errors:
+
+```python
+>>> "hello" + 5
+TypeError: can only concatenate str (not "int") to str
 ```
-if 5 == 20:
-    print("correct")
+
+Python *can* guess, but sometimes, it needs you to be explicit. 
+
+Convert with `str()`, `int()`, `float()`:
+
+```python
+>>> "hello" + str(5)
+'hello5'
+```
+
+Think of operations as **boxes with shaped holes** 
+
+The arithmetic `plus` operation would be a box with two square holes
+
+A round peg (`str`) won't fit in a square hole (`int` math). 
+
+---
+
+## If statements
+
+An `if` statement lets your code *make decisions*
+
+```python
+if condition:
+    # do this only if condition is True
 else:
-    print("incorrect")
+    # do this only if condition is False
 ```
 
+For example
+```python
+age = 18
+
+# note that if statements only accept true or false
+# the condition below simply evalutates into one
+if age >= 18:
+    print("You can vote")
+else:
+    print("Too young")
+```
 
 ---
 
-# Code jumpscare
+## Revisiting that earlier code 
 
 
 ```python
