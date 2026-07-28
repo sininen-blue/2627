@@ -8,118 +8,117 @@ lineNumbers: true
 
 ---
 
-problem with memory access
+## The problem with memory access
 
-cpus have always been faster than memories
+A computer has a problem with memory access.
 
-the faster the cpu is, compared tmemory, the more time the cpu has to wait 
+CPUs have always been faster than memories.
+
+The faster the CPU is when compared to memory, the more time the CPU must wait.
+
+---
+
+## Simple solutions
 
 
-some solutions
+There are two solutions to this problem. 
 
-just start reads, but stall the cpu if required
+The first solution is to start the read operation and stall the CPU if the data is not ready. 
 
-or don't stall, just compile code to generate things to do before word arrives, still stalling
+The second solution is to not stall the CPU. 
 
+The compiler can generate code to do other work before the memory word arrives. The CPU still stalls.
 
-economics
+---
 
-we know hot to make really fast memory, but they need to be near the cpu
+## The economic problem
 
-travel is the most expensive part
+We know how to make very fast memory. 
+
+However, fast memory must be near the CPU. 
+
+Travel is the most expensive part of memory access. 
 
 https://planetscale.com/blog/caching
 
-more memory on cpu makes it bigger, so it's expensive and limits to how expensive we can make it
+More memory on the CPU makes the CPU larger. 
 
-so our choice is small fast memory or large slow memory
+A larger CPU costs more and is more expensive to produce. 
 
-
-what is it
-
-caching is a way of comdinign fast with large to get fast speed with capacity (almost)
-
-the idea is ismple, put heavly used memoyr words into the cache, when cpu needs word, look at cache first
-
-
-why it works
-
-it works since programs usaully access data closse to each other, this is called the locality principle
-
-so you chunk the data you put into the acache with data close to it also in the cache
-
-so the next call the cpu makes, it might use the cache
-
-so if a word is read or written k times, the computer will need 1 reference to slow memory (the first one)
-
-but only k-1 references to fast memory
-
-larger k faster performance
+This limits how much memory we can put on the CPU. Our choice is a small fast memory or a large slow memory.
 
 ---
 
-hit ratio and miss rations
+## What is caching
 
-formally, we have
-c cache access time
-m main memory access time
-h hit ration which is a fraction of all references that can be satrisfaied out of the cache
+Caching is a way to combine fast memory with large memory. 
 
+The goal is to get the speed of fast memory with the capacity of large memory. 
 
-h = (k - 1)k
+The idea is simple. 
 
-miss ratio also exists which is just 1-h
+Put heavily used memory words into the cache. 
 
----
-
-mean access times
-
-mean access time = c (1 - h)m
-
-since h -> 1, all references can be satisfied out of the cach and access time approaches c
-
-if h = 0, a memory references is needed every time so the access time approaches c + m (check achec first)
+When the CPU needs a word, look at the cache first.
 
 ---
 
+## Locality principle
 
-cache lines
+Caching works because programs usually access data close to each other. 
 
-using locality princile, main memories and caches are divided up into fixed size blocks
+This is called the locality principle. 
 
-blocks inside the cache are called cache lines
+You put data into the cache in chunks. 
 
-when a cache miss happens, the entire cache line is loaded from the main memory, not just the needed word
+Data close to the first word is also in the cache. 
 
-so
+When the CPU makes the next call, it can use the cache. 
 
-64 byte line size, a referecn ot memory address 260 will pull line consisiting of bytes 256 - 319 into one cache line
+If a word is read or written $k$ times, the computer needs one reference to slow memory. 
 
-
-with some luck, we'll hit the cache lines
-
----
-
-issuse in cache design
-
-bigger cache size means better performance, but slower to access and more cost
-
-how the ache is organized is also another issue
-
-and whether insturcions and data are kept in the same cache
+This is the first reference. It needs only $k - 1$ references to fast memory. A larger $k$ gives faster performance.
 
 ---
 
+## Mean access time
 
-unifiied cache/split cache
+Formally, we have three symbols. 
 
-unified is impler
+- $c$ is the cache access time. 
+- $m$ is the main memory access time. 
+- $h$ is the hit ratio. 
 
+The hit ratio is the fraction of all references that the cache can satisfy. 
 
-harvard architecture
+$$
+h = (k - 1)k.
+$$
 
-split or harvard allows aparallel access a unified 
+and the miss ratio is $h-1$
 
-fifth issue is number of caches1
+---
 
+## Mean access time (cont)
 
+The mean access time is $c + (1 - h)m$
+
+When $h$ approaches $1$, all references come from the cache. The access time goes to $c$. 
+
+When $h$ approaches $0$, the computer needs a memory reference every time. The access time goes to $c + m$. The computer checks the cache first.
+
+---
+
+## Cache lines
+
+With the locality principle, main memories and caches divide into fixed size blocks. 
+
+The blocks inside the cache are called cache lines. 
+
+When a cache miss occurs, the computer loads the entire cache line from the main memory. 
+
+It does not load only the needed word. 
+
+For example, with a 64 byte line size, a reference to memory address 260 pulls a line that contains bytes 256 to 319 into one cache line. 
+
+With some luck, we will hit other words in that cache line.
