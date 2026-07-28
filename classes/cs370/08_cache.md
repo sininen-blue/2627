@@ -7,118 +7,235 @@ lineNumbers: true
 # Cache
 
 ---
+layout: two-cols-header
+---
 
 ## The problem with memory access
 
-A computer has a problem with memory access.
+::left::
 
-CPUs have always been faster than memories.
+A computer has a problem with memory access. CPUs have always been faster than memories.
 
-The faster the CPU is when compared to memory, the more time the CPU must wait.
+Consider a modern `4 GHz` CPU. 
 
+- Each clock cycle takes $0.25$ nanoseconds. 
+- DDR5 memory access needs about $80$ nanoseconds. 
+
+> In the time the CPU waits for **one** memory read, it could have *executed 320 instructions*.
+
+::right::
+
+| Component | Typical latency |
+|---|---|
+| CPU cycle (4 GHz) | 0.25 ns |
+| L1 cache hit | ~1 ns |
+| L2 cache hit | ~4 ns |
+| L3 cache hit | ~10 ns |
+| DRAM (DDR5) | ~80 ns |
+| SSD (NVMe) | ~10,000 ns |
+
+A single DRAM access costs **320 CPU cycles** worth of waiting.
+
+---
+layout: two-cols-header
 ---
 
 ## Simple solutions
 
+::left::
+There are several ways to deal with the speed gap.
 
-There are two solutions to this problem. 
+**Wait states** The simplest approach 
+- Start a memory read and stall the CPU until the data arrives. 
+- The CPU does nothing for hundreds of cycles.
 
-The first solution is to start the read operation and stall the CPU if the data is not ready. 
+**Out-of-order execution** 
+- The CPU keeps a window of decoded instructions. 
+- While waiting for one memory read, it executes other instructions that are ready.
 
-The second solution is to not stall the CPU. 
+::right::
 
-The compiler can generate code to do other work before the memory word arrives. The CPU still stalls.
+These techniques help. 
+
+However, they cannot erase the *gap* between CPU speed and memory speed. The true solution is caching.
 
 ---
+layout: two-cols-header
+---
 
-## The economic problem
+## The memory hierarchy
 
-We know how to make very fast memory. 
+::left::
 
-However, fast memory must be near the CPU. 
+We know how to make **very fast** memory. 
 
-Travel is the most expensive part of memory access. 
+- *SRAM* (static RAM) uses six transistors per bit. It is **fast but expensive and dense**
+- *DRAM* (dynamic RAM) uses one transistor and one capacitor per bit. It is **slow but cheap and dense**
 
-https://planetscale.com/blog/caching
+The cost and speed of memory depend on *distance*. 
 
-More memory on the CPU makes the CPU larger. 
+Memory near the CPU must be small because it sits on the same die. 
 
-A larger CPU costs more and is more expensive to produce. 
+Memory far from the CPU can be large but takes time to reach.
 
-This limits how much memory we can put on the CPU. Our choice is a small fast memory or a large slow memory.
+[PlanetScale: Caching](https://planetscale.com/blog/caching)
+
+::right::
+
+```
+        _________
+        |       |
+        |  CPU  |  <-- registers (0 cycles)
+        |_______|
+           |    |
+      L1 cache  |  <-- 1-2 cycles, ~32-64 KB
+           |    |
+      L2 cache  |  <-- 4-7 cycles, ~256 KB-1 MB
+           |    |
+      L3 cache  |  <-- 10-30 cycles, ~8-64 MB
+           |    |
+         DRAM   |  <-- ~80 ns, ~8-256 GB
+           |    |
+          SSD   |  <-- ~10 µs, ~256 GB-4 TB
+           |    |
+          HDD   |  <-- ~10 ms, ~1-20 TB
+```
+
+The memory hierarchy is a pyramid. Each level is *larger*, *slower* and **cheaper**. 
 
 ---
 
 ## What is caching
 
-Caching is a way to combine fast memory with large memory. 
+A cache is a small, fast memory that holds *copies of frequently used data* from a larger, slower memory.
 
-The goal is to get the speed of fast memory with the capacity of large memory. 
+The idea is *simple*. 
+1. Put the **most heavily** used memory words *into the cache*. 
+2. When the CPU needs a word, *look at the cache first*. 
+3. If the word is there, the CPU gets it in one or two cycles. 
+4. If the word is not there, the CPU must wait for the slow memory.
 
-The idea is simple. 
+Caching works because most programs do not access memory randomly
 
-Put heavily used memory words into the cache. 
+---
+layout: two-cols-header
+---
 
-When the CPU needs a word, look at the cache first.
+## Temporal and spatial locality
+
+::left::
+
+Caching works because of the **locality principle**. 
+
+Programs access data in *predictable* clusters.
+
+There are two types of locality.
+
+1. **Temporal locality.** 
+
+If a program uses a memory word *now*, it will probably use the same word again *soon*. 
+
+2. **Spatial locality.** 
+
+If a program uses a memory word, it will probably use *nearby words* next. 
+
+::right::
+
+```c
+int sum_array(int* arr, int n) {
+    int sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += arr[i];
+    }
+    return sum;
+}
+```
+
+- The variable `sum` shows *temporal locality*. 
+- The loop counter `i` shows *temporal locality*. 
+- The array access `arr[i]` shows *spatial locality*, because elements sit at **consecutive** memory addresses.
 
 ---
 
-## Locality principle
+## Hit ratio and mean access time
 
-Caching works because programs usually access data close to each other. 
+Formally, we have three symbols.
 
-This is called the locality principle. 
+- $c$ is the *cache access time* 
+- $m$ is the *main memory access time* 
+- $h$ is the *hit ratio*, the fraction of all references that the cache can satisfy
 
-You put data into the cache in chunks. 
+The hit ratio is often written as $h = (k - 1)/k$, 
 
-Data close to the first word is also in the cache. 
+where $k$ is the number of times a word is referenced and the miss ratio is $1 - h$.
 
-When the CPU makes the next call, it can use the cache. 
-
-If a word is read or written $k$ times, the computer needs one reference to slow memory. 
-
-This is the first reference. It needs only $k - 1$ references to fast memory. A larger $k$ gives faster performance.
-
----
-
-## Mean access time
-
-Formally, we have three symbols. 
-
-- $c$ is the cache access time. 
-- $m$ is the main memory access time. 
-- $h$ is the hit ratio. 
-
-The hit ratio is the fraction of all references that the cache can satisfy. 
+The **mean access time** combines both cases:
 
 $$
-h = (k - 1)k.
+\text{Mean access time} = c + (1 - h)m
 $$
 
-and the miss ratio is $h-1$
+When $h$ approaches $1$, almost all references come from the cache and the access time goes to $c$.
+
+When $h$ approaches $0$, the CPU must go to main memory every time and the access time goes to $c + m$.
 
 ---
+layout: two-cols-header
+---
 
-## Mean access time (cont)
+## Example
 
-The mean access time is $c + (1 - h)m$
+::left::
 
-When $h$ approaches $1$, all references come from the cache. The access time goes to $c$. 
+*Given:*
+- Cache hit time $c = 1$ ns
+- DRAM miss time $m = 100$ ns
+- Hit ratio $h = 0.95$
 
-When $h$ approaches $0$, the computer needs a memory reference every time. The access time goes to $c + m$. The computer checks the cache first.
+*Computation:*
+
+$$
+\begin{aligned}
+t &= c + (1 - h)m \\
+  &= 1 + (0.05)(100) \\
+  &= 1 + 5 \\
+  &= 6 \text{ ns}
+\end{aligned}
+$$
+
+::right::
+
+| Hit ratio | Mean access time | Slowdown vs cache |
+|---|---|---|
+| 0.90 | 11.0 ns | 11.0x |
+| 0.95 | 6.0 ns | 6.0x |
+| 0.98 | 3.0 ns | 3.0x |
+| 0.99 | 2.0 ns | 2.0x |
+| 0.999 | 1.1 ns | 1.1x |
+
+A 99 percent hit ratio brings the system within 10 percent of pure cache speed. 
 
 ---
 
 ## Cache lines
 
-With the locality principle, main memories and caches divide into fixed size blocks. 
+With the *locality principle*, main memories and caches divide into fixed size blocks. 
 
-The blocks inside the cache are called cache lines. 
+The blocks inside the cache are called **cache lines** (or cache blocks).
 
-When a cache miss occurs, the computer loads the entire cache line from the main memory. 
+When a **cache miss** occurs, 
 
-It does not load only the needed word. 
+- the computer loads the entire cache line from main memory. 
+- It does not load only the needed word. 
+- This decision exploits *spatial locality*.
 
-For example, with a 64 byte line size, a reference to memory address 260 pulls a line that contains bytes 256 to 319 into one cache line. 
+---
 
-With some luck, we will hit other words in that cache line.
+## Cache lines example
+
+For example, 
+
+- with a $64$-byte line size, 
+- a reference to memory address $260$ pulls a line that contains bytes $256$ to $319$ into one cache line. 
+- The next access to byte *300* is already a **hit**.
+
