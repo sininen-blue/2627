@@ -166,4 +166,111 @@ if player touches coin:
 
 The opposite of counting up is counting down
 
+Essentially the same as counting up, but just goes down instead
+
+And we **stop** when we hit a target value
+
+```
+timeLeft = 30
+
+while gameRunning == True:
+    timeLeft -= 1
+    sleep(1)
+```
+
+| Step | Action | `timer` value |
+|------|--------|:---:|
+| Start | Initialize | 30 |
+| 1 | Wait 1 sec, change by -1 | 29 |
+| 2 | Wait 1 sec, change by -1 | 28 |
+| ... | ... | ... |
+| 30 | Wait 1 sec, change by -1 | **0 → stop** |
+
 ---
+
+## Flags
+
+Often we need a variable that stores the *current state* of something
+
+either in the form of discrete states
+- `state = "playing"`, 
+- `state = "paused"`, 
+- `state = "game over"`, 
+- `state = "menu"`
+
+or checks
+- `is_paused = false`
+- `is_playing = true`
+
+---
+
+## Flags (cont)
+
+```python
+state = "playing"
+
+while state == "playing":
+    # play the game
+    if player presses "pause":
+        state = "paused"
+```
+
+or 
+
+```python
+is_playing = true
+is_paused = false
+
+while is_playing:
+    # play the game
+    if player presses "pause":
+        is_playing = false
+        is_paused = true
+```
+
+---
+
+## Flags (cont)
+
+A flag variable doesn't count, it **switches** between values:
+
+```text
+gameState:  menu  →  playing  →  game over
+                ↑           ↓
+                └─ paused ──┘
+```
+
+The variable acts as a **traffic light**
+
+This replaces a tangled mess of `if` blocks with a single variable that controls the flow.
+
+Or a collection of descriptive variables that have clearly defined limits 
+
+---
+
+## Max trackers
+
+How do you remember the highest score
+
+Exactly the same way as setting the score (counting), but with an added check
+
+---
+
+## Swaps
+
+As an open challenge, figure out a way to switch
+
+```python
+x = 10
+y = 50
+```
+
+Without using the values themselves
+
+The goal output is 
+
+```python
+x = 50
+y = 10
+```
+
