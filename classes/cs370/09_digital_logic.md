@@ -43,7 +43,7 @@ We don't read the exact voltage, only whether it crosses a threshold.
 The gap between the voltage ranges is called the **noise margin** — it lets a `1` still read as a `1` even when noise nudges the signal.
 
 ::right::
-<img src="./public/transistor.png" class="mx-auto rounded w-1/2">
+<img src="/transistor.png" class="mx-auto rounded w-1/2">
 
 ---
 layout: two-cols-header
@@ -62,7 +62,7 @@ It has **three pins**:
 
 ::right::
 
-<img src="./public/transistor.png" class="mx-auto rounded w-1/3">
+<img src="/transistor.png" class="mx-auto rounded w-1/3">
 
 By applying a small voltage to the **base**, we **open or close** the circuit:
 
@@ -77,7 +77,7 @@ Wiring a few transistors together forms the elementary gates:
 
 These three are the raw **building blocks** of digital circuits.
 
-<img src="./public/transistor-gates.png" class="mx-auto rounded w-2/3">
+<img src="/transistor-gates.png" class="mx-auto rounded w-2/3">
 
 Where **a** is an *inverter*, **b** is a *NAND* gate, **c** is a *NOR* gate
 
@@ -89,7 +89,7 @@ So for our *inverter*, whenever $V_{in}$ is low, $V_{out}$ is high and vice vers
 
 Where we're converting a logical $0$ to a logical $1$ and vice versa
 
-<img src="./public/transistor.png" class="mx-auto rounded w-1/4">
+<img src="/transistor.png" class="mx-auto rounded w-1/4">
 
 ---
 
@@ -101,7 +101,7 @@ These three circuits, and their equivalents, form the three simplest gates calle
 
 If we adopt the *convention* that "high" ($V_{cc}$ volts) is a logical $1$, and that "low" (ground) is a logical $0$, we can express the output value as a function of the input values
 
-<img src="./public/gates.png" class="mx-auto rounded w-3/4">
+<img src="/gates.png" class="mx-auto rounded w-3/4">
 
 ---
 layout: center
@@ -156,7 +156,7 @@ $$
 M = f(A, B, C)
 $$
 
-<img src="./public/3-var-truthtable.png" class="mx-auto rounded w-1/4">
+<img src="/3-var-truthtable.png" class="mx-auto rounded w-1/4">
 
 This is a *majority function*, meaning it's 1 if a majority of the inputs are 1, and 0 otherwise
 
@@ -177,7 +177,7 @@ layout: two-cols-header
 Note that any boolean function can be specified by telling which combinations of input variables give an **output of $1$**
 
 ::left::
-<img src="./public/3-var-truthtable.png" class="mx-auto rounded w-1/4">
+<img src="/3-var-truthtable.png" class="mx-auto rounded w-1/4">
 
 For example, there are four combinations of input variables that make $M$ into $1$
 
@@ -227,7 +227,7 @@ Given a sum-of-products expression, we build a circuit in a few mechanical steps
 
 Starting from the truth table
 
-<img src="./public/3-var-truthtable.png" class="mx-auto rounded w-1/4">
+<img src="/3-var-truthtable.png" class="mx-auto rounded w-1/4">
 
 Note that this is **neither** the *standard* nor the most *efficient* method of implementing these functions in circuits
 
@@ -237,7 +237,7 @@ But they do present an uncluttered and clear starting point which can be improve
 
 Note the convention of a *dot* meaning connection, and no dot meaning no connection
 
-<img src="./public/circuit.png" class="mx-auto rounded w-3/4">
+<img src="/circuit.png" class="mx-auto rounded w-3/4">
 
 ---
 
@@ -267,7 +267,7 @@ Thankfully, converting a circuit to use only a single type of gate is straightfo
 
 These use **`NAND`** and **`NOR`** gate forms as they are considered *universal gates*
 
-<img src="./public/universal-gates.png" class="mx-auto rounded w-2/4">
+<img src="/universal-gates.png" class="mx-auto rounded w-2/4">
 
 ---
 layout: two-cols-header
@@ -296,13 +296,13 @@ $$
 AB + AC
 $$
 
-<img src="./public/abplusac.png" class="mx-auto rounded w-2/4">
+<img src="/abplusac.png" class="mx-auto rounded w-2/4">
 
 $$
 A(B + C)
 $$
 
-<img src="./public/abplusc.png" class="mx-auto rounded w-2/4">
+<img src="/abplusc.png" class="mx-auto rounded w-2/4">
 
 Uses the *distributive law*
 
@@ -312,7 +312,7 @@ Uses the *distributive law*
 
 ## Identities
 
-<img src="./public/identities.png" class="mx-auto rounded w-2/4">
+<img src="/identities.png" class="mx-auto rounded w-2/4">
 
 Here are some major identities, but there are others
 
@@ -324,7 +324,15 @@ By using these identities, we can convert larger functions to smaller functions
 
 Pick one topic and turn it into a short report.
 
-- **The gates** — explain every gate (NOT, AND, OR, NAND, NOR, XOR) and why each one works the way it does
-- **Proving the laws** — prove De Morgan's laws, the absorption law, and the AND form of the distributive law
-- **Karnaugh maps** — use a Karnaugh map to simplify a boolean function and compare it with algebraic simplification
-- **Universal gates** — show that NAND (and NOR) alone can build every other gate, and why that matters in practice
+- **The gates** - explain every gate (NOT, AND, OR, NAND, NOR, XOR) and why each one works the way it does
+    - truth tables of each gate
+    - what they look like in transistors
+- **Proving the laws** - prove De Morgan's laws, the absorption law, and the AND form of the distributive law
+    - use truth tables, and
+    - boolean algebra
+- **Simplifying logic** - use a boolean algebra identities to simplify a couple of boolean logic functions
+    - $F = A + AB$
+    - $F = A(B + \bar{A}) + A\bar{B}$
+- **Universal gates** - show that NAND (and NOR) alone can build every other gate, and why that matters in practice
+    - each gate being converted
+    - why those conversions matter
