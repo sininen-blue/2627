@@ -5,7 +5,8 @@
   "scripts": {
     "build": "slidev build",
     "dev": "slidev --open $(find ./classes -name '*.md' | fzf)",
-    "export": "slidev export --dark $(find ./classes -name '*.md' | fzf) --with-clicks"
+    "export": "slidev export --dark $(find ./classes -name '*.md' | fzf) --with-clicks",
+    "export:all": "slidev export --dark $(find ./classes -name '*.md' | sort) --with-clicks"
   },
   "dependencies": {
     "@slidev/cli": "^52.16.0",
