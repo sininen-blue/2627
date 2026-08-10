@@ -341,3 +341,26 @@ Pick one topic and turn it into a short report.
 - **Universal gates** - show that NAND (and NOR) alone can build every other gate, and why that matters in practice
     - each gate being converted
     - why those conversions matter
+
+---
+
+## Rubric
+
+*All members receive the same score*
+
+| Points | Criteria | Explanation |
+|--------|----------|-------------|
+| **10 pts** | Technical accuracy | All proofs, truth tables, simplifications, and gate explanations are correct. No logical or factual errors. |
+| **8 pts** | Usage of diagrams | Includes clear, relevant diagrams (gate symbols, transistor schematics, circuit diagrams) that support the explanation. |
+| **7 pts** | Completeness | Covers every sub-point listed for the chosen topic |
+| **5 pts** | Quality of explanations | The "why" is explained clearly, identities are named, proof logic is justified, conversions are motivated |
+
+
+*Each member scored separately*
+
+| Points | Criteria | Explanation |
+|--------|----------|-------------|
+| **6 pts** | Content mastery | Reporter understands their portion deeply, can explain reasoning, justify steps, and answer follow-up questions without relying on notes. |
+| **4 pts** | Delivery | Reporter presents clearly and confidently, audible, well-paced, makes eye contact, doesn't just read off a script. |
+
+**Total:** 40 pts per student = 30 (group) + 10 (individual)
