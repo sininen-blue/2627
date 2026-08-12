@@ -1,6 +1,6 @@
 ---
 title: 11 Combinational Circuits
-exportFilename: exports/cs370/10_combinational_circuits
+exportFilename: exports/cs370/11_combinational_circuits
 lineNumbers: true
 ---
 
