@@ -31,13 +31,13 @@ char grade = 'A';
 
 Contrast this with **objects/composites**
 
-— a `String`, a `List`, a `struct` all bundle primitives together.
+- a `String`, a `List`, a `struct` all bundle primitives together.
 
 ---
 
 ## Type systems
 
-**Static vs. dynamic** - is type checked before running (compile time) or while running?
+**Static vs. dynamic** - is it type checked before running (compile time) or while running?
 
 **Strong vs. weak** - does the language let types silently convert into each other?
 
@@ -60,9 +60,89 @@ int x = "5" + 3;
 
 ---
 
+## Static typing
+
+Types are checked *before* the program runs, at **compile time**.
+
+Every variable's type is fixed the moment it's declared, and it **cannot change** later.
+
+```java
+String name = "Ana";
+name = 42;          // compile error: String ≠ int
+```
+
+Because the compiler knows every type up front, it **catches** mismatches before the program ever starts.
+
+- **Examples:** `Java`, `C`, `C++`, `Rust`, `Go`
+- The *cost*: you need to commit to a type from the very start.
+
+---
+
+## Dynamic typing
+
+Types are checked *while* the program runs, at **runtime**.
+
+A variable has no fixed type - its type is whatever value it *currently* holds.
+
+```python
+x = 5           # x is an int
+x = "five"      # now x is a string - no error
+```
+
+Type errors only surface when the offending line actually *executes*:
+
+```python
+name = "Ana"
+name + 5        # TypeError - only when this line runs
+```
+
+- **Examples:** `Python`, `JavaScript`, `Ruby`
+- The *gain*: less ceremony 
+- the *cost*: mistakes hide until they happen.
+
+---
+
+## Strong typing
+
+The language does **not** let types silently convert into each other.
+
+Mismatched types are an *error*, you **must** convert explicitly.
+
+```python
+"5" + 3         # TypeError: can only concatenate str (not "int") to str
+```
+
+Explicit conversion is the fix:
+
+```python
+int("5") + 3    # 8
+```
+
+- **Examples:** `Python`, `Java`, `Rust`
+- Strong typing *refuses* to guess what you meant.
+
+---
+
+## Weak typing
+
+The language *silently converts* types to make an operation work.
+
+Convenient in the moment, the result may *not* be what you meant.
+
+```js
+"5" + 3     // "53" — + prefers string concatenation
+"5" - 3     // 2    — - has no string meaning, so it converts
+```
+
+- **Examples:** `JavaScript`, `C`
+- That `"5" + 3` is the *same expression* as earlier - one line, three outcomes, three languages.
+
+---
+
 ### Floating points
 
 ```js
+// javascript
 0.1 + 0.2 === 0.3   
 0.1 + 0.2           
 ```
@@ -75,7 +155,7 @@ they are a rounding trade-off (IEEE 754).
 
 Some fractions just can't be represented *exactly* in binary, the same way 1/3 can't be represented exactly in decimal.
 
-**Rule of thumb:** never compare floats with `==`. Compare with a tolerance:
+**Rule of thumb:** never compare floats with `==` Compare with a tolerance:
 
 ```python
 abs(x - 0.3) < 1e-9
@@ -83,14 +163,52 @@ abs(x - 0.3) < 1e-9
 
 ---
 
-## Boolean as a primitive - truthy/falsy varies!
+## Booleans
+
+A boolean is a value that is either `true` or `false` — nothing else.
+
+Named after **George Boole** (1815–1864), who showed that logic could be written down as *algebra*.
+
+```python
+is_enrolled = True
+```
+
+It's **slightly different** from every other pirmitive scalar type
+
+- every other primitive has a *range* of possible values
+- a boolean has exactly *two* possible values, there is no *third* state
+
+Every comparison
+- all the **result of a comparison** become booleans - `5 > 3` returns a `boolean`, not an `int` or a `string`
+- it's the **only** type that drives **control flow**: `if`, `while`, and `for` all ask for a boolean
+
+---
+
+## Truthiness
+
+Booleans are only `true` or `false` - but many languages let *non-boolean* values be used **wherever a boolean is expected**.
+
+When a value gets converted to a boolean automatically, we call its answer *truthy* or *falsy*:
+
+- a **truthy** value acts like `true` when placed in an `if` or a condition
+- a **falsy** value acts like `false`
+
+```js
+// javascript
+if ("hello") { ... }   // "hello" is truthy — this runs
+if (0) { ... }         // 0 is falsy — this doesn't
+```
+
+---
+
+## Boolean as a primitive - truthy/falsy varies
 
 | Value | JavaScript | Python | Java |
 |---|---|---|---|
 | `0` | falsy | falsy | *n/a - not a boolean* |
 | `""` (empty string) | falsy | falsy | *n/a* |
 | `[]` (empty array) | **truthy** | falsy | *n/a* |
-| `null` / `None` | falsy | falsy | *n/a — NullPointerException risk* |
+| `null` / `None` | falsy | falsy | *n/a - NullPointerException risk* |
 | `"0"` (string zero) | **truthy** | truthy | *n/a* |
 
 Java refuses to play this game at all 
@@ -117,13 +235,13 @@ That's a **design choice**, not a missing feature.
 
 ## Common early mistakes
 
-1. Assuming integers are infinite
+1. Assuming integers are *infinite*
 
-Remember that computers are ones and zeroes, and computers have a limited amount of them
+Remember that computers are ones and zeroes, and computers have a **limited** amount of them
 
-So an integer isn't infinite*, it's bound by how many 1s and 0s are assigned to them
+So an integer **isn't** infinite*, it's bound by how many 1s and 0s are assigned to them
 
-*`Python` actually is infinite, since it automatically increases the amount of bits a number has
+> *`Python` actually is infinite, since it automatically increases the amount of bits a number has
 
 But a language like `c` will stop at $2147483647$ and loop back to $-2147483647$
 
@@ -213,7 +331,7 @@ Associativity tells you *which way* to read operators of the *same* precedence.
 # - is left-associative: (10 - 3) - 2 = 5
 ```
 
---
+---
 
 ## Precedence traps
 
