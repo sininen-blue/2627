@@ -55,7 +55,7 @@ Same expression, three outcomes:
 
 ```java
 // Java (static, strong)
-String s = "5" + 3; 
+int x = "5" + 3;
 ```
 
 ---
@@ -69,11 +69,11 @@ String s = "5" + 3;
 
 Floats are a **finite binary approximation** of an infinite decimal space
 
-"Incorrect" outputs of floating opint operations are a bug, 
+*"Incorrect"* outputs of floating point operations are a bug, 
 
 they are a rounding trade-off (IEEE 754). 
 
-Some fractions just can't be represented exactly in binary, the same way 1/3 can't be represented exactly in decimal.
+Some fractions just can't be represented *exactly* in binary, the same way 1/3 can't be represented exactly in decimal.
 
 **Rule of thumb:** never compare floats with `==`. Compare with a tolerance:
 
@@ -121,7 +121,7 @@ That's a **design choice**, not a missing feature.
 
 Remember that computers are ones and zeroes, and computers have a limited amount of them
 
-So an integer isn't infinite*, they are bound by how many 1s and 0s are assigned to them
+So an integer isn't infinite*, it's bound by how many 1s and 0s are assigned to them
 
 *`Python` actually is infinite, since it automatically increases the amount of bits a number has
 
@@ -131,7 +131,7 @@ But a language like `c` will stop at $2147483647$ and loop back to $-2147483647$
 
 ## Common early mistakes
 
-2. Assuming floats are exact -> `if (x == 0.3)` will never fire
+2. Assuming floats are *exact* -> `if (x == 0.3)` will never fire
 
 > Try `0.1 + 0.2`
 
@@ -289,7 +289,7 @@ composite: {name: "Ana", age: 21}  ← a struct/object of two scalars
 
 Every primitive from the first section was a scalar. 
 
-Not every scalar has to be a language "primitive" though
+Not every scalar has to be a language *"primitive"* though
 
 Some languages have scalar types that aren't primitives (e.g. a `Date` object treated as one logical value).
 
