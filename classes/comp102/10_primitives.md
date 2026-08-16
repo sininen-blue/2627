@@ -23,6 +23,7 @@ The language doesn't let you look inside it or ask it for methods on its own dat
 
 The following code are some of the primitives defined in `Java`
 ```java
+// Java
 int age = 21;
 double gpa = 3.7;
 boolean isEnrolled = true;
@@ -67,6 +68,7 @@ Types are checked *before* the program runs, at **compile time**.
 Every variable's type is fixed the moment it's declared, and it **cannot change** later.
 
 ```java
+// Java
 String name = "Ana";
 name = 42;          // compile error: String ≠ int
 ```
@@ -85,6 +87,7 @@ Types are checked *while* the program runs, at **runtime**.
 A variable has no fixed type - its type is whatever value it *currently* holds.
 
 ```python
+# Python
 x = 5           # x is an int
 x = "five"      # now x is a string - no error
 ```
@@ -92,6 +95,7 @@ x = "five"      # now x is a string - no error
 Type errors only surface when the offending line actually *executes*:
 
 ```python
+# Python
 name = "Ana"
 name + 5        # TypeError - only when this line runs
 ```
@@ -109,12 +113,14 @@ The language does **not** let types silently convert into each other.
 Mismatched types are an *error*, you **must** convert explicitly.
 
 ```python
+# Python
 "5" + 3         # TypeError: can only concatenate str (not "int") to str
 ```
 
 Explicit conversion is the fix:
 
 ```python
+# Python
 int("5") + 3    # 8
 ```
 
@@ -130,6 +136,7 @@ The language *silently converts* types to make an operation work.
 Convenient in the moment, the result may *not* be what you meant.
 
 ```js
+// JavaScript
 "5" + 3     // "53" — + prefers string concatenation
 "5" - 3     // 2    — - has no string meaning, so it converts
 ```
@@ -158,6 +165,7 @@ Some fractions just can't be represented *exactly* in binary, the same way 1/3 c
 **Rule of thumb:** never compare floats with `==` Compare with a tolerance:
 
 ```python
+# Python
 abs(x - 0.3) < 1e-9
 ```
 
@@ -170,6 +178,7 @@ A boolean is a value that is either `true` or `false` — nothing else.
 Named after **George Boole** (1815–1864), who showed that logic could be written down as *algebra*.
 
 ```python
+# Python
 is_enrolled = True
 ```
 
@@ -268,6 +277,7 @@ $1/3$ never terminates in decimal. IEEE 754 stores the closest 53-bit approximat
 In c
 
 ```c
+// C
 if (x = 5) { ... }   // assigns 5, then evaluates truthy — always runs!
 ```
 
@@ -279,6 +289,7 @@ if (x = 5) { ... }   // assigns 5, then evaluates truthy — always runs!
 In Python the equivalent `=`-in-condition is a syntax error, not a silent bug:
 
 ```python
+# Python
 if x = 5:      # SyntaxError: invalid syntax
 ```
 
@@ -297,6 +308,7 @@ You already know: **P**arens > **E**xponents > **M**ultiply/**D**ivide > **A**dd
 Programming languages extend that ladder downward:
 
 ```
+# Pseudocode
 ()                      highest
 **  (exponent)
 * / %
@@ -308,6 +320,7 @@ Programming languages extend that ladder downward:
 ```
 
 ```python
+# Python
 2 + 3 * 4          # 14, not 20
 2 + 3 == 5 and 1   # comparisons bind tighter than 'and'
 ```
@@ -321,12 +334,13 @@ Precedence tells you *what* goes first.
 Associativity tells you *which way* to read operators of the *same* precedence.
 
 ```python
+# Python
 2 ** 3 ** 2
 # ** is right-associative: 2 ** (3 ** 2) = 2 ** 9 = 512
-# NOT (2 ** 3) ** 2 = 64
 ```
 
 ```python
+# Python
 10 - 3 - 2
 # - is left-associative: (10 - 3) - 2 = 5
 ```
@@ -337,11 +351,13 @@ Associativity tells you *which way* to read operators of the *same* precedence.
 
 
 ```python
+# Python
 True or False and False 
 ```
 
 More "what does this print?" 
 ```python
+# Python
 0 and 5
 "a" or "b"
 1 < 2 < 3
@@ -356,6 +372,7 @@ More "what does this print?"
 Knowing the rules matters, but you should know when to stop relying on them for readability:
 
 ```js
+// JavaScript
 // Technically correct, precedence-perfect:
 if (a && b || c && !d)
 
@@ -368,6 +385,7 @@ if ((a && b) || (c && !d))
 ## Exercise 
 
 ```python
+# Python
 x = 5
 y = 2
 print(x + y * 2 > 8 and not y == 2)
@@ -400,6 +418,7 @@ A **scalar** is a single atomic value - one number, one boolean, one character.
 A **composite** (array, list, struct, object) bundles multiple values together.
 
 ```
+# Pseudocode
 scalar:    42
 composite: [42, 7, 13]        ← an array of three scalars
 composite: {name: "Ana", age: 21}  ← a struct/object of two scalars
@@ -416,6 +435,7 @@ Some languages have scalar types that aren't primitives (e.g. a `Date` object tr
 ## Arrays are collections of scalars
 
 ```python
+# Python
 totals = [12, 45, 7]
 totals[1]     # 45 — indexing INTO a composite gets you back to a scalar
 ```
@@ -430,6 +450,7 @@ We'll talk about these later but it's useful to know
 1. Predict the output, then explain in one sentence *why*:
 
 ```python
+# Python
 print(2 + 3 * 2 ** 2)
 ```
 
