@@ -186,3 +186,118 @@ This is a direct, practical application of the MUX/DEMUX concepts above:
 
 rather than needing one dedicated wire per key.
 
+---
+layout: center
+---
+
+# Decoders
+
+---
+layout: two-cols-header
+---
+
+## Decoders
+
+::left::
+Another example of a combinational circuit is a **decoder**
+
+A decoder takes in an 
+
+- $n$-bit number as input and 
+- uses it to *select* (i.e., set to 1) exactly one of the $2n$-output lines
+
+::right::
+<img class="rounded mx-auto w-3/3" src="./decoder.png">
+
+---
+layout: two-cols-header
+---
+
+## Decoders
+
+::left::
+<img class="rounded mx-auto w-3/3" src="./decoder.png">
+
+::right::
+Imagine a small memory consisting of **eight** chips, each containing *256 MB*. 
+
+1. Chip 0 has addresses $0$ to $256$ MB, 
+2. Chip 1 has addresses $256$ MB to $512$ MB, 
+3. and so on. 
+
+When an address is presented to the memory, the high-order 3 bits are used to *select* one of the eight chips. 
+
+---
+layout: two-cols-header
+---
+
+## Decoders
+
+::left::
+Using the circuit, these 3 bits are the three inputs, A, B, and C. 
+
+Depending on the inputs, **exactly one** of the eight output lines, D0 , . . . , D7 , is 1; 
+
+> The rest are 0.
+
+Each output line *enables one of the eight* memory chips. 
+
+Because only one output line is set to 1, **only one chip is enabled**
+
+And so you can use the rest of the bits to now *address* the 256 Mb memory lines inside that enabled chip
+
+::right::
+
+<img class="rounded mx-auto w-3/3" src="./decoder.png">
+
+---
+layout: two-cols-header
+---
+
+## Decoders
+
+::left::
+**Without a decoder**, every chip would need its own *equality check* on the 3 high-order address bits:
+
+- Chip 0 enabled when `ABC = 000`
+- Chip 1 enabled when `ABC = 001`
+- ...
+- Chip 7 enabled when `ABC = 111`
+
+That's **8 separate comparator circuits**, all testing the same 3 bits in parallel.
+
+::right::
+**With a decoder**, a single shared 3-to-8 circuit replaces all eight:
+
+- Produces **all 8 enable lines at once**
+- **One-hot** output — exactly one chip can ever be enabled
+- **Scales cheaply**: $n$ input bits give $2^n$ outputs, so 10 bits could address **1024 chips** with one small circuit
+
+---
+layout: center
+---
+
+# Comparators
+
+---
+layout: two-cols-header
+---
+
+## Comparators
+
+::left::
+A **comparator** is another useful circuit that *compares* two input words.
+
+The simple comparator takes two inputs, **A** and **B**, each of length **4 bits**, and produces a **1** if they are *equal* and a **0** otherwise.
+
+It is built from **XOR** (EXCLUSIVE OR) gates:
+
+- XOR outputs **0** if its inputs are *equal*
+- XOR outputs **1** if its inputs *differ*
+
+::right::
+<img class="rounded mx-auto w-2/3" src="./comparator.png">
+
+If the two words are equal, **all four** XOR gates output 0.
+
+> A **NOR** gate is used as the final stage to *reverse* the sense of the test: **1** means equal, **0** means unequal.
