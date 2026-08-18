@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NeoLMS Worksheet Grader
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  Bulk grade worksheet assignments with rubric rows
 // @match        https://urios.neolms.com/teacher_dropbox_assignment/grade/*
 // @match        https://urios.neolms.com/teacher_team_assignment/grade/*
@@ -177,7 +177,7 @@
                     </div>
 
                     <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center;">
-                        <label style="font-size: 12px; color: #aaa; white-space: nowrap;">Rows:</label>
+                        <label style="font-size: 12px; color: #aaa; white-space: nowrap;">Criteria:</label>
                         <input type="number" id="grade-row-count" value="3" min="1" max="20" style="
                             width: 50px;
                             ${INPUT_STYLE}
@@ -195,12 +195,6 @@
                     </div>
 
                     <div style="margin-bottom: 6px;">
-                        <div style="display: flex; gap: 6px; margin-bottom: 4px; padding: 0 2px;">
-                            <div style="flex: 2; ${LABEL_STYLE}">Criteria</div>
-                            <div style="flex: 1; ${LABEL_STYLE}">Max</div>
-                            <div style="flex: 1; ${LABEL_STYLE}">Earned</div>
-                            <div style="width: 24px;"></div>
-                        </div>
                         <div id="grade-rows" style="
                             max-height: 250px;
                             overflow-y: auto;
@@ -313,16 +307,11 @@
       generateRows(saved.rows.length);
       const container = document.getElementById("grade-rows");
       if (container) {
-        for (
-          let i = 0;
-          i < saved.rows.length && i < container.children.length;
-          i++
-        ) {
-          const row = container.children[i];
-          const nameInput = row.querySelector(".grade-criteria-name");
-          const maxInput = row.querySelector(".grade-max");
-          if (nameInput) nameInput.value = saved.rows[i].name || "";
-          if (maxInput) maxInput.value = saved.rows[i].max || "";
+        const nameInputs = container.querySelectorAll(".grade-criteria-name");
+        const maxInputs = container.querySelectorAll(".grade-max");
+        for (let i = 0; i < saved.rows.length; i++) {
+          if (nameInputs[i]) nameInputs[i].value = saved.rows[i].name || "";
+          if (maxInputs[i]) maxInputs[i].value = saved.rows[i].max || "";
         }
       }
       const multInput = document.getElementById("grade-multiplier");
@@ -359,69 +348,101 @@
     if (!container) return;
     container.innerHTML = "";
 
-    for (let i = 0; i < count; i++) {
+    const makeRow = (label) => {
       const row = document.createElement("div");
-      row.style.cssText = ROW_STYLE;
-      row.innerHTML = `
-                <input type="text" class="grade-criteria-name" placeholder="e.g. Thesis" style="
-                    flex: 2;
-                    ${INPUT_STYLE}
-                ">
-                <input type="number" class="grade-max" placeholder="Max" min="0" style="
-                    flex: 1;
-                    ${INPUT_STYLE}
-                ">
-                <input type="number" class="grade-earned" placeholder="Pts" min="0" style="
-                    flex: 1;
-                    ${INPUT_STYLE}
-                ">
-                <button class="grade-remove-row" style="
-                    width: 24px;
-                    height: 24px;
-                    background: none;
-                    border: 1px solid #555;
-                    border-radius: 4px;
-                    color: #ff4757;
-                    cursor: pointer;
-                    font-size: 14px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-shrink: 0;
-                " title="Remove row">&times;</button>
-            `;
+      row.style.cssText = `${ROW_STYLE}padding-left: 2px;`;
+      const labelEl = document.createElement("div");
+      labelEl.style.cssText = `${LABEL_STYLE}width: 60px; margin: 0; flex-shrink: 0;`;
+      labelEl.textContent = label;
+      row.appendChild(labelEl);
+      return row;
+    };
 
-      row
-        .querySelector(".grade-earned")
-        .addEventListener("input", calculateTotal);
-      row.querySelector(".grade-max").addEventListener("input", calculateTotal);
-      row
-        .querySelector(".grade-remove-row")
-        .addEventListener("click", function () {
-          row.remove();
-          calculateTotal();
-        });
+    const earnedRow = makeRow("Earned");
+    const maxRow = makeRow("Max");
+    const nameRow = makeRow("Criteria");
+    const removeRow = makeRow("");
 
-      container.appendChild(row);
+    const cellStyle = `flex: 1; min-width: 0; ${INPUT_STYLE}`;
+
+    for (let i = 0; i < count; i++) {
+      const earned = document.createElement("input");
+      earned.type = "number";
+      earned.className = "grade-earned";
+      earned.placeholder = "Pts";
+      earned.min = "0";
+      earned.style.cssText = cellStyle;
+      earned.addEventListener("input", calculateTotal);
+      earnedRow.appendChild(earned);
+
+      const max = document.createElement("input");
+      max.type = "number";
+      max.className = "grade-max";
+      max.placeholder = "Max";
+      max.min = "0";
+      max.style.cssText = cellStyle;
+      max.addEventListener("input", calculateTotal);
+      maxRow.appendChild(max);
+
+      const name = document.createElement("input");
+      name.type = "text";
+      name.className = "grade-criteria-name";
+      name.placeholder = "e.g. Thesis";
+      name.style.cssText = cellStyle;
+      nameRow.appendChild(name);
+
+      const remove = document.createElement("button");
+      remove.className = "grade-remove-row";
+      remove.style.cssText = `
+            flex: 1;
+            min-width: 0;
+            height: 24px;
+            background: none;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #ff4757;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+      remove.title = "Remove column";
+      remove.textContent = "\u00d7";
+      remove.addEventListener("click", function () {
+        earned.remove();
+        max.remove();
+        name.remove();
+        remove.remove();
+        calculateTotal();
+      });
+      removeRow.appendChild(remove);
     }
 
+    container.appendChild(earnedRow);
+    container.appendChild(maxRow);
+    container.appendChild(nameRow);
+    container.appendChild(removeRow);
+
     calculateTotal();
-    log(`Generated ${count} rows`);
+    log(`Generated ${count} columns`);
   }
 
   function getRows() {
     const container = document.getElementById("grade-rows");
     if (!container) return [];
 
-    const rows = [];
-    const rowEls = container.children;
+    const names = [...container.querySelectorAll(".grade-criteria-name")];
+    const maxes = [...container.querySelectorAll(".grade-max")];
+    const earned = [...container.querySelectorAll(".grade-earned")];
 
-    for (const row of rowEls) {
-      const name =
-        row.querySelector(".grade-criteria-name")?.value.trim() || "";
-      const max = parseFloat(row.querySelector(".grade-max")?.value) || 0;
-      const earned = parseFloat(row.querySelector(".grade-earned")?.value) || 0;
-      rows.push({ name, max, earned });
+    const rows = [];
+    for (let i = 0; i < names.length; i++) {
+      rows.push({
+        name: names[i]?.value.trim() || "",
+        max: parseFloat(maxes[i]?.value) || 0,
+        earned: parseFloat(earned[i]?.value) || 0,
+      });
     }
 
     return rows;
@@ -583,14 +604,11 @@
     const container = document.getElementById("grade-rows");
     if (!container) return;
 
-    for (const row of container.children) {
-      const name = row.querySelector(".grade-criteria-name");
-      const max = row.querySelector(".grade-max");
-      const earned = row.querySelector(".grade-earned");
-      if (name) name.value = "";
-      if (max) max.value = "";
-      if (earned) earned.value = "";
-    }
+    container
+      .querySelectorAll(".grade-criteria-name, .grade-max, .grade-earned")
+      .forEach((input) => {
+        input.value = "";
+      });
 
     const commentsEl = document.getElementById("grade-comments");
     if (commentsEl) commentsEl.value = "";
