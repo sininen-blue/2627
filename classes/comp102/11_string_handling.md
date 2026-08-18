@@ -1,5 +1,4 @@
 ---
-:wa
 title: 11 String Handling
 exportFilename: exports/comp102/11_string_handling
 lineNumbers: true
@@ -138,3 +137,80 @@ print(f"Pi rounded: {pi:.2f}")   # Pi rounded: 3.14
 "Hello, {}! You are {} years old.".format(name, age)   # .format()
 "Hello, %s! You are %d years old." % (name, age)       # % operator (legacy)
 ```
+
+---
+
+## Exercise: predict the output
+
+For each line, predict the output *before* running it, then explain **why**
+
+```python
+print("5" + "3")
+print("5" + 3)
+print(int("5") + 3)
+print("py" + "thon")
+print("ab" * 3)
+```
+
+---
+
+## Exercise: true or false
+
+For each, say **True** or **False**, and explain your reasoning
+
+1. `"apple" == "Apple"`
+2. `"Zebra" < "apple"`
+3. `"10" < "9"`
+4. `"10" < 9`
+5. `len("Hello") == 5`
+6. `"cat" + "dog" == "catdog"`
+
+---
+
+## Exercise: fix the bug
+
+Each snippet below crashes or misbehaves. Find the bug and fix it.
+
+```python
+age = input("Enter your age: ")
+next_year = age + 1
+print("Next year you'll be", next_year)
+```
+
+```python
+first = "Comp"
+second = 102
+course = first + second
+```
+
+```python
+score = "87"
+print(f"Your score out of 100 is {score * 100}")
+```
+
+---
+
+## Exercise: convert to f-strings
+
+Rewrite each of these using an **f-string**
+
+```python
+name = "Ada"
+score = 91.5
+
+print("Hello, " + name + "! Your score is " + str(score) + ".")
+
+print("{} scored {:.1f} points".format(name, score))
+
+print("%s scored %.1f points" % (name, score))
+```
+
+---
+
+## Exercise: short answer
+
+1. Why does `"10" < "9"` evaluate to `True`, even though `10` is bigger than `9`?
+2. Why does `input()` always return a string, even when the user types digits?
+3. Give one reason strings are described as **immutable**. What does that actually mean in practice?
+4. What is the difference between `"5" + "3"` and `5 + 3`?
+5. Name one advantage of f-strings over the `+` concatenation approach.
