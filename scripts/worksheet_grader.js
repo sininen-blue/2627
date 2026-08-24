@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NeoLMS Worksheet Grader
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.5
 // @description  Bulk grade worksheet assignments with rubric rows
 // @match        https://urios.neolms.com/teacher_dropbox_assignment/grade/*
 // @match        https://urios.neolms.com/teacher_team_assignment/grade/*
@@ -252,6 +252,16 @@
                             font-weight: bold;
                             color: #000;
                         ">Apply All</button>
+                        <button id="btn-perfect" style="
+                            flex: 1;
+                            padding: 8px 12px;
+                            background: #2ed573;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            color: #000;
+                        ">Perfect</button>
                         <button id="btn-clear" style="
                             flex: 1;
                             padding: 8px 12px;
@@ -278,6 +288,13 @@
         `;
     document.body.appendChild(panel);
 
+    panel.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      if (e.target.tagName === "TEXTAREA") return;
+      e.preventDefault();
+      handleApply();
+    });
+
     document
       .getElementById(`${PANEL_PREFIX}-collapse-btn`)
       .addEventListener("click", toggleCollapse);
@@ -285,6 +302,7 @@
       .getElementById("btn-generate")
       .addEventListener("click", handleGenerate);
     document.getElementById("btn-apply").addEventListener("click", handleApply);
+    document.getElementById("btn-perfect").addEventListener("click", handlePerfect);
     document.getElementById("btn-clear").addEventListener("click", handleClear);
     document
       .getElementById("grade-multiplier")
@@ -518,11 +536,24 @@
       return false;
     }
 
-    input.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
-    input.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+    const fire = (name, opts) =>
+      input.dispatchEvent(new MouseEvent(name, { bubbles: true, cancelable: true, ...opts }));
+
+    const rect = input.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const coords = { clientX: x, clientY: y, screenX: x, screenY: y };
+
+    fire("pointerdown", { pointerId: 1, button: 0, pointerType: "mouse", isPrimary: true, ...coords });
+    fire("mousedown", { button: 0, detail: 1, ...coords });
     input.focus();
+    fire("pointermove", coords);
+    fire("pointerup", { pointerId: 1, button: 0, pointerType: "mouse", isPrimary: true, ...coords });
+    fire("mouseup", { button: 0, detail: 1, ...coords });
+    fire("click", { button: 0, detail: 1, ...coords });
+
     input.value = score;
-    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: String(score) }));
     input.dispatchEvent(new Event("change", { bubbles: true }));
     input.select();
 
@@ -561,6 +592,32 @@
     const input = document.getElementById("grade-row-count");
     const count = parseInt(input?.value) || 3;
     generateRows(Math.max(1, Math.min(20, count)));
+  }
+
+  function handlePerfect() {
+    const container = document.getElementById("grade-rows");
+    if (!container) return;
+
+    const earned = [...container.querySelectorAll(".grade-earned")];
+    const maxes = [...container.querySelectorAll(".grade-max")];
+    let filled = 0;
+
+    for (let i = 0; i < earned.length && i < maxes.length; i++) {
+      const max = parseFloat(maxes[i].value) || 0;
+      if (max > 0) {
+        earned[i].value = max;
+        filled++;
+      }
+    }
+
+    if (filled === 0) {
+      log("No max values to fill. Set Max points first.", "error");
+      return;
+    }
+
+    calculateTotal();
+    log(`Filled ${filled} criteria to max`, "success");
+    handleApply();
   }
 
   function handleApply() {
