@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NeoLMS Worksheet Grader
 // @namespace    http://tampermonkey.net/
-// @version      1.5
+// @version      1.6
 // @description  Bulk grade worksheet assignments with rubric rows
 // @match        https://urios.neolms.com/teacher_dropbox_assignment/grade/*
 // @match        https://urios.neolms.com/teacher_team_assignment/grade/*
@@ -81,23 +81,62 @@
     localStorage.setItem(`${PANEL_PREFIX}_dock_position`, pos);
   }
 
+  const STORE_KEY = `${PANEL_PREFIX}_state_by_title`;
+
+  function getClassTitle() {
+    const el = document.querySelector(".sectionTitle h1");
+    return el?.textContent?.trim() || "";
+  }
+
+  function getActivityTitle() {
+    const el = document.querySelector(".pageHeading h1");
+    return el?.textContent?.trim() || "";
+  }
+
+  function loadAllState() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function saveAllState(store) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  }
+
   function saveState() {
+    const classTitle = getClassTitle();
+    const activityTitle = getActivityTitle();
+    if (!classTitle || !activityTitle) {
+      log("Skipping save: class/activity title not found", "warning");
+      return;
+    }
+
     const rows = getRows();
     const data = {
       rows: rows.map((r) => ({ name: r.name, max: r.max })),
       multiplier:
         parseFloat(document.getElementById("grade-multiplier")?.value) || 1,
     };
-    localStorage.setItem(`${PANEL_PREFIX}_state`, JSON.stringify(data));
+
+    const store = loadAllState();
+    if (!store[classTitle]) store[classTitle] = {};
+    store[classTitle][activityTitle] = data;
+    saveAllState(store);
   }
 
   function loadState() {
-    try {
-      const raw = localStorage.getItem(`${PANEL_PREFIX}_state`);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
+    const classTitle = getClassTitle();
+    const activityTitle = getActivityTitle();
+    if (!classTitle || !activityTitle) {
+      log("Skipping restore: class/activity title not found", "warning");
       return null;
     }
+
+    const store = loadAllState();
+    return store[classTitle]?.[activityTitle] || null;
   }
 
   function createUI() {
@@ -332,6 +371,10 @@
           if (maxInputs[i]) maxInputs[i].value = saved.rows[i].max || "";
         }
       }
+      log(
+        `Restored criteria for "${getClassTitle()}" / "${getActivityTitle()}"`,
+        "info",
+      );
       const multInput = document.getElementById("grade-multiplier");
       if (multInput && saved.multiplier) multInput.value = saved.multiplier;
       calculateTotal();
@@ -672,8 +715,21 @@
     const multiplier = document.getElementById("grade-multiplier");
     if (multiplier) multiplier.value = "1";
 
-    localStorage.removeItem(`${PANEL_PREFIX}_state`);
     calculateTotal();
+
+    const classTitle = getClassTitle();
+    const activityTitle = getActivityTitle();
+    if (classTitle && activityTitle) {
+      const store = loadAllState();
+      if (store[classTitle]) {
+        delete store[classTitle][activityTitle];
+        if (Object.keys(store[classTitle]).length === 0) {
+          delete store[classTitle];
+        }
+        saveAllState(store);
+      }
+    }
+
     updateStatus("Cleared");
     log("All rows cleared");
   }
