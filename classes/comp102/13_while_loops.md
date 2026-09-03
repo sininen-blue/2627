@@ -218,9 +218,22 @@ while True:
 
 ---
 
+## Exercises
 
-lett
+Using a `while` loop, write a program that:
 
-addressed to pres, through hr, endorsed dean and vp acad
+1. Prints every even number from 2 to 20
+2. Asks the user for a password, and keeps asking until they type "secret"
+3. Starts at 100 and keeps subtracting 7 until the value is 0 or below, printing each step
+4. Adds up numbers from 1 to 50 and prints the final total
+5. Asks the user to enter numbers one at a time, stopping when they type a negative number, and prints how many numbers they entered
 
-training attended from the cbe thing (2)
+---
+
+## Exercises
+
+1. A bank account starts with $50 and earns $5 interest every year. Print the balance each year until it reaches $100. How many years did it take?
+2. A car has 12 litres of fuel and uses 3 litres per hour of driving. Print the remaining fuel after each hour until it runs out.
+3. A student needs 60 hours of volunteering. They volunteer 4 hours a week. Print how many weeks it takes, and the total hours after each week.
+4. You are given a number by the user. Keep dividing it by 2 (using integer division) and print each result, stopping once it reaches 0. Count how many times you divided.
+5. A plant is 2cm tall and grows 3cm every day. Print the height each day until it is taller than 30cm.
