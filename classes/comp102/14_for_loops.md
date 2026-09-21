@@ -270,4 +270,3 @@ Using a `for` loop, write a program that:
 3. A student volunteers 4 hours a week for 15 weeks. Print how many total hours they have after each week.
 4. You are given a list of numbers. Print only the numbers that are divisible by 3, skipping all others.
 5. A plant is 2cm tall and grows 3cm every day. Print the height each day for 14 days, and stop early if it grows taller than 30cm.
-</content>

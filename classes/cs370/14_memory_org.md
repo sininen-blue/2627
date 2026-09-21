@@ -1,6 +1,6 @@
 ---
-title: 13 Memory Organization
-exportFilename: exports/cs370/13_memory_organization
+title: 14 Memory Organization
+exportFilename: exports/cs370/14_memory_organization
 lineNumbers: true
 ---
 
