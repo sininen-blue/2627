@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         NeoLMS Quiz Inputter
 // @namespace    http://tampermonkey.net/
-// @version      2.2
-// @description  Bulk paste quiz questions from Markdown and submit sequentially
+// @version      3.0
+// @description  Bulk paste quiz questions (mc, many, blank, freeform, tf) from Markdown and submit sequentially
 // @match        https://urios.neolms.com/quiz_question_bank/new_question/*
+// @match        https://urios.neolms.com/teacher_quiz_assignment/questions/*
 // @grant        none
 // ==/UserScript==
 
@@ -15,14 +16,28 @@
   const AUTO_KEY = "quiz_auto_continue";
   const LOG_KEY = "quiz_logs";
   const TOTAL_KEY = "quiz_total_count";
+  const PENDING_TYPE_KEY = "quiz_pending_type";
 
-  const fields = [
-    "#question_description",
-    "#text_1",
-    "#text_2",
-    "#text_3",
-    "#text_4",
-  ];
+  const MODAL_WAIT_TIMEOUT_MS = 10000;
+
+  // Short markdown type key -> NeoLMS `type=` query param value.
+  const TYPE_MAP = {
+    mc: "MultipleChoiceOneAnswer",
+    many: "MultipleChoiceManyAnswers",
+    blank: "FillInTheBlanks",
+    freeform: "Freeform",
+    tf: "TrueOrFalse",
+  };
+
+  const TYPE_LABELS = {
+    mc: "Multiple choice (one answer)",
+    many: "Multiple choice (many answers)",
+    blank: "Fill in the blanks",
+    freeform: "Freeform",
+    tf: "True/False",
+  };
+
+  const KNOWN_TYPES = Object.keys(TYPE_MAP);
 
   let isRunning = false;
 
@@ -79,38 +94,351 @@
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  // --- Page detection ---
+
+  function onNewQuestionPage() {
+    return location.pathname.startsWith("/quiz_question_bank/new_question/");
+  }
+
+  function onQuestionBankPage() {
+    return location.pathname.startsWith("/teacher_quiz_assignment/questions/");
+  }
+
+  function currentPageShortType() {
+    const neoType = new URLSearchParams(location.search).get("type");
+    if (!neoType) return null;
+    return KNOWN_TYPES.find((k) => TYPE_MAP[k] === neoType) || null;
+  }
+
   // --- Parsing ---
 
-  function parseInput(text) {
-    const normalizedText = text.replace(/\\n/g, "\n");
+  const META_RE = /^(type|points)\s*:\s*(.*)$/i;
+  const OPTION_RE = /^([-*])\s+(.*)$/;
 
-    const blocks = normalizedText
-      .split(/---/)
+  function splitBlocks(text) {
+    const normalized = text.replace(/\r\n/g, "\n").replace(/\\n/g, "\n");
+    return normalized
+      .split(/^[ \t]*---[ \t]*$/m)
       .map((b) => b.trim())
-      .filter((b) => b);
+      .filter((b) => b.length > 0);
+  }
 
-    return blocks.map((block) => {
-      const lines = block.split("\n");
-      const firstBulletIndex = lines.findIndex((line) =>
-        line.trim().startsWith("- "),
+  function parseBlock(raw, blockNumber) {
+    const errors = [];
+    const lines = raw.split("\n");
+    let i = 0;
+    const meta = {};
+
+    while (i < lines.length) {
+      const m = META_RE.exec(lines[i].trim());
+      if (!m) break;
+      meta[m[1].toLowerCase()] = m[2].trim();
+      i++;
+    }
+
+    if (Object.keys(meta).length > 0) {
+      if (i >= lines.length || lines[i].trim() !== "") {
+        errors.push(
+          `Block ${blockNumber}: expected a blank line after the type:/points: metadata`,
+        );
+      } else {
+        i++; // consume the blank line
+      }
+    }
+
+    const bodyLines = lines.slice(i);
+
+    const type = (meta.type || "mc").toLowerCase();
+    if (!KNOWN_TYPES.includes(type)) {
+      errors.push(
+        `Block ${blockNumber}: unknown type "${meta.type}" (expected one of: ${KNOWN_TYPES.join(", ")})`,
       );
+      return { errors };
+    }
 
-      if (firstBulletIndex !== -1) {
-        const question = lines.slice(0, firstBulletIndex).join("\n").trim();
-        const options = lines
-          .slice(firstBulletIndex)
-          .map((line) => line.trim())
-          .filter((line) => line.startsWith("- "))
-          .map((line) => line.substring(2).trim());
+    let points = 1;
+    if (meta.points !== undefined) {
+      const n = Number(meta.points);
+      if (!Number.isFinite(n) || n <= 0) {
+        errors.push(`Block ${blockNumber}: invalid points "${meta.points}"`);
+      } else {
+        points = n;
+      }
+    }
 
-        return [question, ...options];
+    const optionStart = bodyLines.findIndex((l) => OPTION_RE.test(l.trim()));
+    const questionLines =
+      optionStart === -1 ? bodyLines : bodyLines.slice(0, optionStart);
+    const question = questionLines.join("\n").trim();
+
+    if (!question) {
+      errors.push(`Block ${blockNumber}: missing question text`);
+    }
+
+    const optionLines =
+      optionStart === -1
+        ? []
+        : bodyLines
+            .slice(optionStart)
+            .map((l) => l.trim())
+            .filter((l) => l.length > 0);
+
+    const options = [];
+    for (const line of optionLines) {
+      const m = OPTION_RE.exec(line);
+      if (!m) {
+        errors.push(`Block ${blockNumber}: malformed option line "${line}"`);
+        continue;
+      }
+      options.push({ marker: m[1], text: m[2].trim() });
+    }
+
+    if (errors.length) return { errors };
+
+    switch (type) {
+      case "mc": {
+        if (options.length < 2)
+          errors.push(`Block ${blockNumber}: mc needs at least 2 options`);
+        if (options.length > 12)
+          errors.push(`Block ${blockNumber}: mc supports at most 12 options`);
+        const correct = options.filter((o) => o.marker === "*");
+        if (correct.length !== 1) {
+          errors.push(
+            `Block ${blockNumber}: mc needs exactly one "*" option (found ${correct.length})`,
+          );
+        }
+        if (errors.length) return { errors };
+        return {
+          item: {
+            type: "mc",
+            points,
+            question,
+            options: options.map((o) => o.text),
+            correctIndex: options.findIndex((o) => o.marker === "*") + 1,
+          },
+        };
       }
 
-      return block
-        .split(/\s*-\s+/)
-        .map((p) => p.trim())
-        .filter((p) => p);
+      case "many": {
+        if (options.length < 2)
+          errors.push(`Block ${blockNumber}: many needs at least 2 options`);
+        if (options.length > 12)
+          errors.push(
+            `Block ${blockNumber}: many supports at most 12 options`,
+          );
+        const correctIndices = options
+          .map((o, idx) => (o.marker === "*" ? idx + 1 : null))
+          .filter((v) => v !== null);
+        if (correctIndices.length === 0) {
+          errors.push(
+            `Block ${blockNumber}: many needs at least one "*" option`,
+          );
+        }
+        if (errors.length) return { errors };
+        return {
+          item: {
+            type: "many",
+            points,
+            question,
+            options: options.map((o) => o.text),
+            correctIndices,
+          },
+        };
+      }
+
+      case "blank": {
+        const blankCount = (question.match(/BLANK/g) || []).length;
+        if (blankCount === 0) {
+          errors.push(
+            `Block ${blockNumber}: blank question has no "BLANK" placeholder`,
+          );
+        }
+        if (options.length !== blankCount) {
+          errors.push(
+            `Block ${blockNumber}: ${blankCount} BLANK placeholder(s) but ${options.length} answer line(s)`,
+          );
+        }
+        if (options.some((o) => o.marker !== "-")) {
+          errors.push(
+            `Block ${blockNumber}: blank answers must use "-", not "*"`,
+          );
+        }
+        if (errors.length) return { errors };
+        return {
+          item: {
+            type: "blank",
+            points,
+            question,
+            blanks: options.map((o) =>
+              o.text.split(",").map((s) => s.trim()),
+            ),
+          },
+        };
+      }
+
+      case "freeform": {
+        if (options.length > 0) {
+          errors.push(`Block ${blockNumber}: freeform does not take options`);
+        }
+        if (errors.length) return { errors };
+        return { item: { type: "freeform", points, question } };
+      }
+
+      case "tf": {
+        if (options.length !== 1) {
+          errors.push(
+            `Block ${blockNumber}: tf needs exactly one answer line (true or false)`,
+          );
+        } else if (options[0].marker !== "-") {
+          errors.push(
+            `Block ${blockNumber}: tf answer must use "-", not "*"`,
+          );
+        } else if (!/^(true|false)$/i.test(options[0].text)) {
+          errors.push(
+            `Block ${blockNumber}: tf answer must be "true" or "false"`,
+          );
+        }
+        if (errors.length) return { errors };
+        return {
+          item: {
+            type: "tf",
+            points,
+            question,
+            answer: /^true$/i.test(options[0].text),
+          },
+        };
+      }
+
+      default:
+        errors.push(`Block ${blockNumber}: unhandled type "${type}"`);
+        return { errors };
+    }
+  }
+
+  function preParse(text) {
+    const blocks = splitBlocks(text);
+    const items = [];
+    const errors = [];
+
+    blocks.forEach((raw, idx) => {
+      const { item, errors: blockErrors } = parseBlock(raw, idx + 1);
+      if (blockErrors && blockErrors.length) errors.push(...blockErrors);
+      else if (item) items.push(item);
     });
+
+    return { items: errors.length ? [] : items, errors };
+  }
+
+  // --- Field fillers ---
+
+  function setValue(selector, value) {
+    const el = document.querySelector(selector);
+    if (el) el.value = value;
+    return !!el;
+  }
+
+  function clickToCheck(selector) {
+    const el = document.querySelector(selector);
+    if (!el) return false;
+    if (!el.checked) el.click();
+    return true;
+  }
+
+  function fillCommon(item) {
+    let ok = true;
+    ok = setValue("#question_description", item.question) && ok;
+    ok = setValue("#question_points", String(item.points)) && ok;
+    return ok;
+  }
+
+  function fillMultipleChoiceOne(item) {
+    let ok = fillCommon(item);
+    item.options.forEach((text, idx) => {
+      ok = setValue(`#text_${idx + 1}`, text) && ok;
+    });
+    ok = clickToCheck(`#question_correct_${item.correctIndex}`) && ok;
+    return ok;
+  }
+
+  function fillMultipleChoiceMany(item) {
+    let ok = fillCommon(item);
+    item.options.forEach((text, idx) => {
+      ok = setValue(`#text_${idx + 1}`, text) && ok;
+    });
+    item.correctIndices.forEach((i) => {
+      ok = clickToCheck(`#correct_${i}`) && ok;
+    });
+    return ok;
+  }
+
+  function fillBlank(item) {
+    let ok = fillCommon(item);
+    item.blanks.forEach((alts, idx) => {
+      ok = setValue(`#blank_${idx + 1}`, alts.join(", ")) && ok;
+    });
+    return ok;
+  }
+
+  function fillFreeform(item) {
+    return fillCommon(item);
+  }
+
+  function fillTrueFalse(item) {
+    let ok = fillCommon(item);
+    const selector = item.answer
+      ? "#question_true_or_false_true"
+      : "#question_true_or_false_false";
+    ok = clickToCheck(selector) && ok;
+    return ok;
+  }
+
+  const FILLERS = {
+    mc: fillMultipleChoiceOne,
+    many: fillMultipleChoiceMany,
+    blank: fillBlank,
+    freeform: fillFreeform,
+    tf: fillTrueFalse,
+  };
+
+  // --- Submit buttons ---
+
+  function findSubmitLink(which) {
+    const links = document.querySelectorAll(
+      'a[href^="javascript:submit_new_question"]',
+    );
+    for (const a of links) {
+      if ((a.getAttribute("href") || "").includes(`"${which}"`)) return a;
+    }
+    return null;
+  }
+
+  function findTypeLink(targetNeoType) {
+    const links = document.querySelectorAll('a[href*="new_question/"]');
+    for (const a of links) {
+      try {
+        const url = new URL(a.getAttribute("href"), location.origin);
+        if (url.searchParams.get("type") === targetNeoType) return a;
+      } catch (e) {
+        // ignore malformed hrefs
+      }
+    }
+    return null;
+  }
+
+  // --- Queue state helpers ---
+
+  function clearQueueState() {
+    sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(AUTO_KEY);
+    sessionStorage.removeItem(TOTAL_KEY);
+    sessionStorage.removeItem(PENDING_TYPE_KEY);
+  }
+
+  function haltBatch(message) {
+    log(message, "error");
+    updateStatus("Error — batch halted");
+    sessionStorage.removeItem(AUTO_KEY);
+    isRunning = false;
   }
 
   // --- Queue Processing ---
@@ -131,49 +459,117 @@
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
 
     const done = total - queue.length;
-    updateStatus(`${done}/${total} — processing question ${done}`);
+    updateStatus(
+      `${done}/${total} — filling ${TYPE_LABELS[current.type] || current.type} question`,
+    );
     updateProgress(done, total);
 
-    if (current && Array.isArray(current)) {
-      fields.forEach((sel, i) => {
-        const el = document.querySelector(sel);
-        if (el && current[i]) el.value = current[i];
-      });
-
-      log(`Filled: ${current[0].substring(0, 60)}...`, "success");
-
-      const submitBtn = document.querySelector(
-        'a[href*="commit_and_another_same"]',
+    const pageType = currentPageShortType();
+    if (pageType !== current.type) {
+      // Put the item back so nothing is lost, and stop.
+      queue.unshift(current);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
+      haltBatch(
+        `Page is set up for "${pageType ? TYPE_LABELS[pageType] : "an unrecognized type"}" but the next question is "${TYPE_LABELS[current.type]}". Navigate to the right page and press Start again.`,
       );
-      if (submitBtn) {
-        const isLast = queue.length === 0;
-        setTimeout(() => {
-          submitBtn.click();
-          if (isLast) {
-            updateStatus(`Done — ${total} questions submitted`);
-            updateProgress(total, total);
-            log(`Batch complete — ${total} questions`, "success");
-            sessionStorage.removeItem(AUTO_KEY);
-            sessionStorage.removeItem(TOTAL_KEY);
-            clearLogs();
-            isRunning = false;
-          }
-        }, 500);
-      } else {
-        log("Submit button not found", "error");
-        updateStatus("Error — submit button not found");
-        sessionStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+
+    const filler = FILLERS[current.type];
+    let ok = false;
+    try {
+      ok = filler ? filler(current) : false;
+    } catch (e) {
+      log(`Error filling fields: ${e.message}`, "error");
+      ok = false;
+    }
+
+    if (!ok) {
+      queue.unshift(current);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
+      haltBatch(
+        `Could not fill one or more fields for a "${TYPE_LABELS[current.type]}" question — check the form still matches the expected layout.`,
+      );
+      return;
+    }
+
+    log(
+      `Filled (${TYPE_LABELS[current.type]}): ${current.question.substring(0, 60)}...`,
+      "success",
+    );
+
+    const next = queue[0];
+    const isLast = queue.length === 0;
+
+    if (isLast) {
+      submitWith("commit_and_another_same", () => {
+        updateStatus(`Done — ${total} questions submitted`);
+        updateProgress(total, total);
+        log(`Batch complete — ${total} questions`, "success");
+        clearQueueState();
+        clearLogs();
         isRunning = false;
+      });
+      return;
+    }
+
+    if (next.type === current.type) {
+      submitWith("commit_and_another_same", () => {});
+      return;
+    }
+
+    // Type switch needed: generic "add another" lands on the question-bank
+    // page, where the "Add questions" modal must be watched for and the
+    // matching type link clicked to reach the next new_question page.
+    sessionStorage.setItem(PENDING_TYPE_KEY, TYPE_MAP[next.type]);
+    log(
+      `Next question is "${TYPE_LABELS[next.type]}" — switching question type...`,
+      "info",
+    );
+    submitWith("commit_and_another", () => {});
+  }
+
+  function submitWith(which, onDone) {
+    const link = findSubmitLink(which);
+    if (!link) {
+      haltBatch(`Submit button ("${which}") not found`);
+      return;
+    }
+    setTimeout(() => {
+      link.click();
+      onDone();
+    }, 500);
+  }
+
+  function watchForModalAndNavigate(targetNeoType) {
+    const existing = findTypeLink(targetNeoType);
+    if (existing) {
+      proceed(existing);
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      const link = findTypeLink(targetNeoType);
+      if (link) {
+        observer.disconnect();
+        clearTimeout(timer);
+        proceed(link);
       }
-    } else {
-      log("Skipping invalid queue item", "warning");
-      if (queue.length > 0) {
-        setTimeout(processNext, 300);
-      } else {
-        updateStatus("Done");
-        sessionStorage.removeItem(AUTO_KEY);
-        isRunning = false;
-      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const timer = setTimeout(() => {
+      observer.disconnect();
+      sessionStorage.removeItem(PENDING_TYPE_KEY);
+      haltBatch(
+        `Timed out waiting for the "Add questions" modal to switch to ${targetNeoType}.`,
+      );
+    }, MODAL_WAIT_TIMEOUT_MS);
+
+    function proceed(link) {
+      log(`Found type-selection link for ${targetNeoType} — navigating...`, "info");
+      sessionStorage.removeItem(PENDING_TYPE_KEY);
+      link.click();
     }
   }
 
@@ -228,6 +624,11 @@
   function start() {
     if (isRunning) return;
 
+    if (!onNewQuestionPage()) {
+      log("Start can only be used on an Add Question page", "warning");
+      return;
+    }
+
     const input = document.getElementById(`${PANEL_PREFIX}-input`);
     const raw = input ? input.value.trim() : "";
 
@@ -239,25 +640,52 @@
     }
 
     if (queue.length === 0 && raw) {
-      queue = parseInput(raw);
+      const { items, errors } = preParse(raw);
+
+      if (errors.length) {
+        log(`Found ${errors.length} error(s) — fix the pasted text and try again:`, "error");
+        errors.forEach((e) => log(`  ${e}`, "error"));
+        updateStatus(`${errors.length} error(s) — nothing queued`);
+        return;
+      }
+
+      if (items.length === 0) {
+        log("No questions parsed from input", "warning");
+        return;
+      }
+
+      const firstType = items[0].type;
+      const pageType = currentPageShortType();
+      if (pageType !== firstType) {
+        log(
+          `First question is "${TYPE_LABELS[firstType]}" but this page is set up for ${pageType ? `"${TYPE_LABELS[pageType]}"` : "an unrecognized type"}.`,
+          "error",
+        );
+        log(
+          `Navigate to the "Add ${TYPE_LABELS[firstType]}" question page, then press Start again.`,
+          "error",
+        );
+        updateStatus("Error — wrong question type page");
+        return;
+      }
+
+      queue = items;
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
       sessionStorage.setItem(TOTAL_KEY, String(queue.length));
-      log(`Parsed ${queue.length} questions from input`, "info");
+      log(`Parsed ${queue.length} question(s) from input`, "info");
       input.value = "";
     }
 
     isRunning = true;
     sessionStorage.setItem(AUTO_KEY, "1");
-    updateStatus(`Starting — ${queue.length} questions in queue`);
-    log(`Processing ${queue.length} questions`, "info");
+    updateStatus(`Starting — ${queue.length} question(s) in queue`);
+    log(`Processing ${queue.length} question(s)`, "info");
     processNext();
   }
 
   function stop() {
     isRunning = false;
-    sessionStorage.removeItem(STORAGE_KEY);
-    sessionStorage.removeItem(AUTO_KEY);
-    sessionStorage.removeItem(TOTAL_KEY);
+    clearQueueState();
     updateStatus("Stopped — queue cleared");
     updateProgress(0, 1);
     log("Stopped by user", "warning");
@@ -420,21 +848,37 @@
   // --- Init ---
 
   function init() {
-    createUI();
+    if (onNewQuestionPage()) {
+      createUI();
 
-    const queue = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
-    const autoContinue = sessionStorage.getItem(AUTO_KEY) === "1";
-    const total = parseInt(sessionStorage.getItem(TOTAL_KEY) || "0", 10);
+      const queue = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
+      const autoContinue = sessionStorage.getItem(AUTO_KEY) === "1";
+      const total = parseInt(sessionStorage.getItem(TOTAL_KEY) || "0", 10);
 
-    if (autoContinue && queue.length > 0) {
-      const done = total - queue.length;
-      updateStatus(
-        `Resuming — ${done}/${total} done, ${queue.length} remaining`,
+      if (autoContinue && queue.length > 0) {
+        const done = total - queue.length;
+        updateStatus(
+          `Resuming — ${done}/${total} done, ${queue.length} remaining`,
+        );
+        updateProgress(done, total);
+        log(`Auto-resuming — ${queue.length} question(s) left`, "info");
+        isRunning = true;
+        setTimeout(processNext, 800);
+      }
+      return;
+    }
+
+    if (onQuestionBankPage()) {
+      const pendingType = sessionStorage.getItem(PENDING_TYPE_KEY);
+      if (!pendingType) return;
+
+      createUI();
+      updateStatus(`Switching question type (${pendingType})...`);
+      log(
+        `Waiting for the "Add questions" modal to switch to ${pendingType}`,
+        "info",
       );
-      updateProgress(done, total);
-      log(`Auto-resuming — ${queue.length} questions left`, "info");
-      isRunning = true;
-      setTimeout(processNext, 800);
+      watchForModalAndNavigate(pendingType);
     }
   }
 
