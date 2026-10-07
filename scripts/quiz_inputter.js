@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NeoLMS Quiz Inputter
 // @namespace    http://tampermonkey.net/
-// @version      3.0
+// @version      3.1
 // @description  Bulk paste quiz questions (mc, many, blank, freeform, tf) from Markdown and submit sequentially
 // @match        https://urios.neolms.com/quiz_question_bank/new_question/*
 // @match        https://urios.neolms.com/teacher_quiz_assignment/questions/*
@@ -567,7 +567,13 @@
       clearTimeout(timer);
       log(`Found type-selection link for ${targetNeoType} — navigating...`, "info");
       sessionStorage.removeItem(PENDING_TYPE_KEY);
-      link.click();
+      // Use a real navigation instead of link.click(): these modal links are
+      // plain <a href> (unlike the javascript:-href submit buttons), so a
+      // page-level click/router listener could intercept and swallow a
+      // synthetic click without actually navigating.
+      const href = link.getAttribute("href");
+      const url = new URL(href, location.href).toString();
+      location.assign(url);
     }
 
     const observer = new MutationObserver(tryFind);
