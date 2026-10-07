@@ -46,6 +46,12 @@
 - [x] Update `scripts/quiz_inputter.js` version/header comment
       (`@version`, `@description`)
 
+- [x] Write clean authoring documentation (`scripts/quiz-format.md`)
+- [x] Write a quiz-authoring skill (`.pi/skills/neolms-quiz-format/SKILL.md`)
+- [x] Write a test quiz exercising all 5 types + type-switches
+      (`quizes/cs370/finals/test_quiz.md`), validated error-free against the
+      real parser
+
 ## Deferred / future
 
 - [ ] Support explicit per-option `percent` override syntax for `type: many`
