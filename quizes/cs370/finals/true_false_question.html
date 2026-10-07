@@ -1,0 +1,97 @@
+<div id="centreColumn">
+          <div id="alerts" style="display:none"></div>
+
+
+          
+
+<div class="pageHeading flex"><div><h2 id="mobile_page_heading"></h2><h1 class="">Add True or false question</h1></div></div><div class="optionsRibbon optionsRight" style="overflow: visible;"><ul><li class=""><a href="/teacher_quiz_assignment/questions/60049639?add=true&amp;question_bank_id=13943100"><i class="xCross" aria-hidden="true"></i>Cancel</a></li><li class="mobile_only" style="display: none"><div class="dropDownHolder"><a aria-label="toggle dropdown holder" href=""><i class="ellipsis_vertical"></i></a><div class="dropDown"><ul></ul></div></div></li></ul></div>
+
+<p>
+  The answer to this type of question can only be true or false. 
+A correct answer gets full points, and an incorrect answer gets zero points.
+</p>
+
+
+
+  <div class="optionsRibbon" style="overflow: visible;"><ul><li class=""><a href="/quiz_question_bank/new_question/13943100?container_id=60049639&amp;from=%2Fteacher_quiz_assignment%2Fquestions%2F60049639%3Fadd%3Dtrue%26question_bank_id%3D13943100&amp;html=true&amp;type=TrueOrFalse"><i class="htmlMode" aria-hidden="true"></i>HTML mode</a></li><li class="mobile_only" style="display: none"><div class="dropDownHolder"><a aria-label="toggle dropdown holder" href=""><i class="ellipsis_vertical"></i></a><div class="dropDown"><ul></ul></div></div></li></ul></div>
+
+<form id="question" class="noBorderForm" action="/quiz_question_bank/create_question/13943100?container_id=60049639&amp;from=%2Fteacher_quiz_assignment%2Fquestions%2F60049639%3Fadd%3Dtrue%26question_bank_id%3D13943100&amp;type=TrueOrFalse" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="✓"><input type="hidden" name="authenticity_token" value="FfFa3zlm5iE0wCA7IM8a8WJDIa6iYAAuJGDvdSr4v4MC2XqU+Da0Mq9OfMlaWinrK5uIWtBz0bT8ttl5ORdn8A==">
+  <h2 class="">Question</h2>
+
+  <input type="hidden" name="operation" id="operation" value="" class="textInput">
+  <input type="hidden" name="question[html_mode]" id="question_html_mode" value="false" class="textInput">
+  <p><textarea style="height:6em" id="question_description" name="question[description]"></textarea></p>
+<h2 class="">Points</h2><p><input class="textInput" id="question_points" name="question[points]" size="4" type="text" value="1">
+
+
+</p><h2 class="">Answer</h2>
+
+<p>
+  <i class="tick icnColor"></i> <input type="radio" name="question[true_or_false]" id="question_true_or_false_true" value="true" onclick="set_correct_answer(true)"><label for="question_true_or_false_true">True</label>
+  <i class="xCross icnColor"></i> <input type="radio" name="question[true_or_false]" id="question_true_or_false_false" value="false" onclick="set_correct_answer(false)"><label for="question_true_or_false_false">False</label>
+</p>
+
+<h2 class="">Correction</h2>
+
+<p>
+  Display a correction box if the student selects False?
+</p>
+
+
+<script>
+
+  on_ready(function() {set_correction_box(false)});
+</script>
+
+<p>
+  <input type="radio" name="question[display_correction_box]" id="question_display_correction_box_false" value="false" onclick="set_correction_box(false)" checked="checked"><label for="question_display_correction_box_false">No </label>
+  <input type="radio" name="question[display_correction_box]" id="question_display_correction_box_true" value="true" onclick="set_correction_box(true)"><label for="question_display_correction_box_true">Yes </label>
+</p>
+
+<div id="correction" style="display:none">
+  <p>
+    <label>Correction phrase (case insensitive)</label><br>
+    <textarea name="question[correct_answer]" id="question_correct_answer" style="height: 40px;"></textarea><br>
+  </p>
+
+  <p>
+    <label>Correction weight (if student enters incorrect phrase, subtract this percentage of the question's points)</label><br>
+    <input class="textInput" id="question_correction_weight" name="question[correction_weight]" size="4" type="text" value="50">%
+  </p>
+</div>
+
+<h2 class="">Feedback</h2>
+
+<p>
+  <input type="radio" name="question[enable_feedback]" id="question_enable_feedback_false" value="false" onclick="disable_feedback()" checked="checked">
+  <label for="question_enable_feedback_false">No</label>
+
+  <input type="radio" name="question[enable_feedback]" id="question_enable_feedback_true" value="true" onclick="enable_feedback()">
+  <label for="question_enable_feedback_true">Yes</label>
+</p>
+
+
+<div id="feedback" style="display:none">
+    <p>
+      <label>True feedback</label><br>
+      <textarea name="question[choice_1_feedback]" id="question_choice_1_feedback" style="height:80px;"></textarea><br>
+
+      <label>False feedback</label><br>
+      <textarea name="question[choice_2_feedback]" id="question_choice_2_feedback" style="height:80px;"></textarea>
+    </p>
+</div>
+
+  
+</form>
+
+
+<div class="optionsRibbon mt20" style="overflow: visible;"><ul><li class=""><a href="javascript:submit_new_question(&quot;commit&quot;);"><i class="add" aria-hidden="true"></i>Save and return to question bank</a></li><li class=""><a href="javascript:submit_new_question(&quot;commit_and_another_same&quot;);"><i class="add" aria-hidden="true"></i>Save and add another of the same type</a></li><li class=""><a href="javascript:submit_new_question(&quot;commit_and_another&quot;);"><i class="add" aria-hidden="true"></i>Save and add another</a></li><li class="mobile_only" style="display: none"><div class="dropDownHolder"><a aria-label="toggle dropdown holder" href=""><i class="ellipsis_vertical"></i></a><div class="dropDown"><ul></ul></div></div></li></ul></div>
+
+  <script>
+set_focus('material_description');
+</script>
+
+
+
+          
+        </div>
