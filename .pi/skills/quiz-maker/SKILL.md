@@ -2,15 +2,18 @@
 name: quiz-maker
 description: >
   Generates well-structured multiple-choice quizzes from user-provided materials.
-  Always asks for learning objective, difficulty level, and question count before generating.
-  Enforces strict quality rules for distractors, formatting, and wording.
+  Always asks for learning objective, difficulty level, question count, and output
+  format before generating. Supports a plain Markdown MC format and the NeoLMS
+  quiz_inputter.js batch format (mc/many/blank/freeform/tf). Enforces strict
+  quality rules for distractors, formatting, and wording.
   Use when user says "make a quiz", "create a quiz", "quiz me on", "test my knowledge",
   "multiple choice questions", or invokes /quiz.
 ---
 
 # Quiz Maker Skill
 
-Generate multiple-choice quizzes from user-provided learning materials.
+Generate quizzes from user-provided learning materials, in either a plain
+Markdown MC format or the NeoLMS `quiz_inputter.js` batch format.
 
 ## Workflow
 
@@ -21,6 +24,14 @@ Before generating ANY questions, ALWAYS ask the user for:
 1. **Learning Objective** — What should the quiz assess? (e.g., "understand the Pythagorean theorem", "identify React hooks")
 2. **Difficulty Level** — One of: `easy`, `medium`, `hard`, or `mixed`
 3. **Question Count** — How many questions to generate (e.g., 5, 10, 20)
+4. **Output Format** — One of:
+   - **plain** (default) — the simple MC-only Markdown format described below.
+   - **neolms** — the NeoLMS `quiz_inputter.js` batch format (supports `mc`,
+     `many`, `blank`, `freeform`, `tf`). If the user asks for "NeoLMS format",
+     "quiz_inputter format", mentions `scripts/quiz_inputter.js`, or references
+     a `quizes/<course>/.../format.md`-style file, default to this without
+     asking. Also ask for the **type mix** (e.g. mostly `mc` with a couple of
+     `tf`/`blank`) if not specified.
 
 If the user provides source material (notes, textbook excerpt, slides, etc.), use that as the basis for questions. If no material is provided, ask for it.
 
@@ -28,7 +39,16 @@ If the user provides source material (notes, textbook excerpt, slides, etc.), us
 
 Once requirements are confirmed, generate the quiz following the rules below.
 
-## Output Format
+- If **plain** format: follow "Output Format" and the Rules section as-is.
+- If **neolms** format: switch to the `neolms-quiz-format` skill's syntax and
+  workflow — read `scripts/quiz-format.md` for the exact block syntax before
+  writing anything, and follow its content-quality rules (explicit `*`
+  markers, metadata blank-line rule, type-specific validation, etc.). The
+  content-quality rules below (plausible distractors, positive phrasing,
+  length/structure parity, varied stems) still apply across all types in
+  that format, not just `mc`/`many`.
+
+## Output Format (plain)
 
 Every quiz MUST follow this exact format. No header — just question blocks separated by `---`:
 
@@ -54,7 +74,32 @@ Every quiz MUST follow this exact format. No header — just question blocks sep
 ...
 ```
 
-## Rules (STRICT)
+## Output Format (neolms)
+
+When the user wants the NeoLMS `quiz_inputter.js` format instead, do **not**
+use the plain `---`-separated MC-only shape above. Instead:
+
+- Read `scripts/quiz-format.md` (full spec) and follow the `neolms-quiz-format`
+  skill's workflow and syntax rules exactly: `type:`/`points:` metadata (with
+  the required blank line before question text), explicit `*`/`-` markers,
+  `BLANK` placeholders for `blank` type, `true`/`false` for `tf`, no answer
+  lines for `freeform`.
+- Use a mix of types (`mc`, `many`, `blank`, `freeform`, `tf`) as agreed with
+  the user in Step 1, defaulting to mostly `mc` with a couple of `tf`/`blank`
+  if unspecified.
+- Group blocks of the same type adjacently where it doesn't hurt variety, to
+  minimize type-switches for the script, per the `neolms-quiz-format` skill.
+- Still apply every content-quality rule below (plausible distractors,
+  length/structure parity, positive phrasing, varied stems, one clearly
+  correct answer) — they apply regardless of output format.
+- Before handing off, mentally re-check each block against the validation
+  list in `scripts/quiz-format.md`.
+
+## Rules (STRICT, plain format)
+
+These formatting rules apply to the **plain** format. For **neolms** format,
+use the syntax rules above instead — but all Distractor/Question
+Wording/Answer Choice/Content Quality rules below still apply to both.
 
 ### Formatting
 - Every question is multiple choice with exactly **4 options**
@@ -147,3 +192,4 @@ What does NADPH provide in the light-independent reactions?
 - Offer to regenerate with different difficulty or count
 - Offer to focus on specific subtopics
 - Offer to add an answer key with explanations
+- Offer to convert the quiz to the other output format (plain ↔ neolms)
