@@ -18,7 +18,9 @@
   const TOTAL_KEY = "quiz_total_count";
   const PENDING_TYPE_KEY = "quiz_pending_type";
 
-  const MODAL_WAIT_TIMEOUT_MS = 10000;
+  const MODAL_WAIT_TIMEOUT_MS = 20000;
+  const MODAL_POLL_INTERVAL_MS = 300;
+  const MODAL_STILL_WAITING_LOG_MS = 4000;
 
   // Short markdown type key -> NeoLMS `type=` query param value.
   const TYPE_MAP = {
@@ -542,35 +544,61 @@
   }
 
   function watchForModalAndNavigate(targetNeoType) {
-    const existing = findTypeLink(targetNeoType);
-    if (existing) {
-      proceed(existing);
-      return;
+    // The "Add questions" modal can render a loading throbber before its
+    // content (or reveal already-present-but-hidden markup via a class/
+    // attribute toggle rather than inserting new nodes), so a MutationObserver
+    // watching childList alone isn't fully reliable. Poll on an interval as
+    // the primary mechanism and use the observer only to react sooner when
+    // it does fire, with a generous overall timeout.
+    let settled = false;
+
+    function tryFind() {
+      if (settled) return;
+      const link = findTypeLink(targetNeoType);
+      if (link) settle(link);
     }
 
-    const observer = new MutationObserver(() => {
-      const link = findTypeLink(targetNeoType);
-      if (link) {
-        observer.disconnect();
-        clearTimeout(timer);
-        proceed(link);
-      }
+    function settle(link) {
+      if (settled) return;
+      settled = true;
+      observer.disconnect();
+      clearInterval(poller);
+      clearInterval(stillWaitingTimer);
+      clearTimeout(timer);
+      log(`Found type-selection link for ${targetNeoType} — navigating...`, "info");
+      sessionStorage.removeItem(PENDING_TYPE_KEY);
+      link.click();
+    }
+
+    const observer = new MutationObserver(tryFind);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      characterData: true,
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+
+    const poller = setInterval(tryFind, MODAL_POLL_INTERVAL_MS);
+
+    const stillWaitingTimer = setInterval(() => {
+      if (!settled) {
+        log(`Still waiting for the "Add questions" modal (${targetNeoType})...`, "info");
+      }
+    }, MODAL_STILL_WAITING_LOG_MS);
 
     const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
       observer.disconnect();
+      clearInterval(poller);
+      clearInterval(stillWaitingTimer);
       sessionStorage.removeItem(PENDING_TYPE_KEY);
       haltBatch(
         `Timed out waiting for the "Add questions" modal to switch to ${targetNeoType}.`,
       );
     }, MODAL_WAIT_TIMEOUT_MS);
 
-    function proceed(link) {
-      log(`Found type-selection link for ${targetNeoType} — navigating...`, "info");
-      sessionStorage.removeItem(PENDING_TYPE_KEY);
-      link.click();
-    }
+    tryFind();
   }
 
   // --- Collapse ---
