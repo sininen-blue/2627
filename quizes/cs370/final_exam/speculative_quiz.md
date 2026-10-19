@@ -1,63 +1,72 @@
-A compiler hoists a compare-and-branch above independent arithmetic that does not feed the condition. What does that earlier branch buy the scheduler?
+A compiler hoists a compare-and-branch above arithmetic that leaves the condition unchanged. What does that earlier branch buy the scheduler?
 
-* A shorter chain into the branch, and more instructions that can run in parallel
-- Removal of the branch from the control-flow graph
-- A stall of every instruction that originally followed the branch
-- Conversion of the branch itself into a basic block
-
----
-
-The predictor says a branch is not taken, and the core starts the fall-through loads before the condition is ready. What is that execution called?
-
-* Speculative execution: work proceeds on a path whose outcome is still unknown
-- Confirmed execution: work starts only after every earlier branch has resolved
-- Basic-block scheduling: instructions move only inside a block whose exits are known
-- Poisoning: every instruction after the branch is discarded before it runs
+* A shorter dependence chain, and more instructions that run in parallel
+- Removal of that branch from the program's control-flow graph
+- A stall of the instructions that originally followed the branch
+- Conversion of that branch into a basic block of its own
 
 ---
 
-Speculation has already produced results, and the branch then resolves. What is done with those results?
+The predictor selects the fall-through path. The core starts those loads before the condition is ready. What is that execution called?
 
-* They are committed if the speculated path was right and discarded if it was wrong
-- They are committed whether or not the speculated path was right
-- They are discarded whether or not the speculated path was right
-- They are stored permanently as poison bits whether or not the path was right
-
----
-
-A load runs speculatively, before the branch condition is known, and its address is unmapped. Why is that risky?
-
-* It may raise a page fault for a path that was never supposed to execute
-- It always returns a numerically wrong value even when the path is correct
-- It halts the processor before the branch condition can be resolved
-- It makes the branch condition impossible to compute
+* Speculative execution: work runs on a path whose outcome is still unknown
+- Confirmed execution: work starts after the earlier branches have resolved
+- Basic-block scheduling: instructions move inside a block with known exits
+- Poisoning: instructions after the branch are discarded before they run
 
 ---
 
-A speculated instruction is about to signal an exceptional condition. What constraint must that exception satisfy?
+Speculation has produced results, and the branch then resolves. What is done with those results?
 
-* It must have no irrevocable side effect until the speculation is confirmed
-- It must be delivered to the operating system before the branch resolves
-- It must be ignored for the rest of the program once speculation has started
-- It must freeze the control-flow graph so no further blocks are built
+* Commit them when the path was right, and discard them when it was wrong
+- Commit them on a right path and also commit them on a wrong path
+- Discard them on a right path and also discard them on a wrong path
+- Store them as poison bits on both a right path and a wrong path
 
 ---
 
-A speculated divide would raise an exception, but the branch has not resolved yet. What does the hardware do instead of raising it now?
+A speculative load uses an unmapped address while the branch condition is still unknown. Why is that risky?
 
-* It sets the poison bit on the destination register and lets speculation continue
-- It raises the exception immediately, even though the path may be wrong
+* The load can raise a page fault on a path that later proves wrong
+- The load returns a wrong number on a path that later proves right
+- The load stops the processor before the branch condition is computed
+- The load overwrites the branch condition with the faulting address
+
+---
+
+A speculated instruction is about to signal an exception. What constraint must that exception satisfy?
+
+* All of its side effects remain reversible until speculation is confirmed
+- It reaches the operating system before the branch has resolved
+- It is dropped for the rest of the program once speculation starts
+- It freezes the control-flow graph and leaves later blocks unbuilt
+
+---
+
+A speculated divide would raise an exception. The branch is still unresolved. What does the hardware do?
+
+* It sets the poison bit on the destination and lets speculation continue
+- It raises the exception immediately, while the path is still unresolved
 - It deletes the instruction from its basic block and fetches the other path
-- It forces the branch to resolve as mispredicted so the exception cannot occur
+- It marks the branch mispredicted so the exception stays off that path
 
 ---
 
-A register was poisoned during speculation, and no later instruction on the confirmed path reads it. What happens to the deferred exception?
+On the confirmed path, a poisoned register goes unread. What happens to the deferred exception?
 
-* Execution continues, and the exception is not raised
+* Execution continues, and that deferred exception stays latent
 - The exception is raised as soon as the poison bit is set
-- The processor stalls until some instruction reads the poisoned register
-- The poison bit is copied into every architectural register
+- The processor stalls until some instruction reads that register
+- The poison bit is copied into the other architectural registers
+
+---
+
+The confirmed path reads a register that was poisoned during speculation. Which response fits?
+
+* Raise the deferred exception, because the bad value is now consumed
+- Continue, because confirmation clears a poison bit before the read
+- Discard the whole path, because one poison bit voids the confirmed block
+- Copy the poison bit into the link register and keep executing
 
 ---
 
@@ -69,16 +78,7 @@ A straight-line fragment has one entry, one exit, and a conditional branch in th
 
 ---
 
-type: tf
+type: freeform
+points: 3
 
-Hoisting a branch earlier, ahead of independent instructions that do not feed its condition, can expose more instruction-level parallelism.
-
-- true
-
----
-
-type: tf
-
-Results produced by speculative execution are committed even when the branch prediction was wrong.
-
-- false
+A scheduler wants to move instructions across a conditional branch in the middle of a straight-line fragment. Explain why a basic block is limited to one entry and one exit, and what limit that places on the move.

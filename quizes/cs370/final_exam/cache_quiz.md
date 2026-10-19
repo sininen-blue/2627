@@ -1,69 +1,87 @@
 An add finishes in one cycle, but a load from DRAM takes tens of cycles. Why is a cache placed between the CPU and DRAM?
 
-* So the CPU waits fewer cycles for data it is likely to use again
-- So the machine can address more storage than DRAM alone provides
+* So the CPU waits fewer cycles for data it uses again while resident
+- So the machine can address more storage than DRAM alone can provide
 - So DRAM can be removed and the cache holds the entire program
 - So cached values survive a power loss the way a disk would
 
 ---
 
-A kernel keeps rereading a few rows and also walks neighboring elements of those rows. Which statement is the locality principle that makes a cache pay off?
+Address 100 fills a line that includes its neighbors. Which of 101, 102, and 400 can that line serve?
 
-* Over a short window, the program reuses a small set of addresses
-- Over a short window, the program touches every address equally often
-- The program only reuses values that already live on disk
-- After an address is read once, the program never reads it again
+* 101 and 102, because those neighbors arrived in the fetched line
+- 400, because a later address shares the line with address 100
+- 101 alone, because the line holds the requested word and one neighbor
+- 102 and 400, because the line keeps both of those later addresses
 
 ---
 
 Designers place a tiny L1 next to the core and a larger L2 behind it. What tradeoff is that stack of levels making?
 
 * Each lower level gives up some speed in exchange for more capacity
-- Each level is made equally slow so software never prefers one of them
-- The upper levels exist so main memory can be left out of the system
-- The upper levels keep their contents with no power, like nonvolatile storage
+- Each level is given the same latency so software treats them alike
+- The upper levels take the place of main memory for the whole program
+- The upper levels keep their contents across power loss, like a disk
 
 ---
 
-How does a typical L1 data cache compare with the L2 cache behind it?
+How does an L1 data cache compare with the L2 cache behind it?
 
 * L1 holds less data and returns hits in fewer cycles than L2
 - L1 holds more data and returns hits in more cycles than L2
 - L1 and L2 have the same capacity and the same hit latency
-- L1 keeps its contents across power-off and L2 does not
+- L1 holds less data and returns hits in more cycles than L2
 
 ---
 
 A store hits in a write-through cache. When does main memory see that store?
 
 * Main memory is updated at the same time the cache line is updated
-- The store stays in the cache and is never written to main memory
-- The store waits until every line in the cache has become dirty
-- The store skips the cache and is written only to disk
+- The store remains in the cache and main memory stays unchanged
+- The store waits until the last clean line in the cache turns dirty
+- The store skips the cache and is written to disk
 
 ---
 
-A loop stores to the same line hundreds of times. What is the main advantage of write-back over write-through on that loop?
+A loop stores to the same line on each of 200 iterations. What is the advantage of write-back over write-through on that loop?
 
-* Most of those stores stay in the cache, so far fewer writes reach main memory
-- Main memory is guaranteed to match the cache after every individual store
-- The cache can be removed, because write-back talks only to disk
-- Every store becomes a single-cycle write all the way out to disk
+* Those 200 stores can update one cache line and send one write to DRAM
+- Main memory matches the cache after each individual store in the loop
+- The cache can be removed, because write-back sends those stores to disk
+- Each store becomes a single-cycle write all the way out to disk
 
 ---
 
-A dirty line is left stale in DRAM until that line has to be evicted. Which policy is that?
+A write-back line is dirty and is then selected for replacement. When does DRAM receive that line?
 
-* Write-back
-- Write-through
-- Write-allocate
-- Write-around
+* When that dirty line is evicted from the cache
+- When the store that made the line dirty retires
+- When the other clean lines have been written back
+- When the core later reads that same address
+
+---
+
+A small cache can hold a reused matrix. A one-pass stream is larger than that cache. Which data should the designer expect the cache to help?
+
+* The reused matrix rows, because those lines are read again while resident
+- The one-pass stream, because a wider address range produces more hits
+- The first-touch addresses, because the first load of a line is a hit
+- The newly written lines, because a first store keeps later reads in L1
+
+---
+
+A device reads DRAM and must observe a store before its next read of that address. Which write policy is the better fit?
+
+* Write-through, because the device reads DRAM and needs that store visible there
+- Write-back, because holding the store in cache makes DRAM show it sooner
+- Write-around, because the device reads the store from disk after the cache skip
+- A read-only cache, because the device shares the line that was just stored
 
 ---
 
 type: tf
 
-A loop updates the same `sum` on every iteration, so that variable is likely to be used again soon after it was written. That reuse is temporal locality.
+A routine rereads one `counter` on each call. That reuse is temporal locality.
 
 - true
 
@@ -71,7 +89,7 @@ A loop updates the same `sum` on every iteration, so that variable is likely to 
 
 type: tf
 
-Under write-back, a dirty line is copied to main memory as soon as it is written, before any replacement decision.
+Reading `pkt[i]` and then `pkt[i+1]` is temporal locality.
 
 - false
 
@@ -80,4 +98,4 @@ Under write-back, a dirty line is copied to main memory as soon as it is written
 type: freeform
 points: 3
 
-A loop repeatedly updates one `sum` variable and also walks `arr[i]` through consecutive addresses. Explain why those two access patterns let a small cache satisfy most references instead of DRAM.
+The core stalls on L1 hit latency. Explain how you would choose between enlarging L1 until the working set fits, and keeping a small L1 with a larger L2. Which cost would make you refuse the larger L1?
